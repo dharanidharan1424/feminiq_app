@@ -1,0 +1,147 @@
+{
+  "natural-haircare-tips": {
+    "id": "001",
+    "slug": "natural-haircare-tips",
+    "title": "Natural Haircare Tips for Healthy Locks",
+    "date": "August 10, 2025",
+    "author": "Priya Sharma",
+    "badge": "Haircare",
+    "hero": "https://res.cloudinary.com/dv9s7sm0x/image/upload/v1755930935/hair1_opamny.jpg",
+    "excerpt": "These simple, effective haircare tips will help you achieve strong, shiny, natural locks every day.",
+    "quickTips": [
+      "Avoid washing hair daily to prevent dryness.",
+      "Use sulfate-free shampoos and nourishing conditioners.",
+      "Incorporate scalp massages for better circulation.",
+      "Limit heat styling to protect hair integrity.",
+      "Trim split ends regularly to maintain healthy growth."
+    ],
+    "content": [
+      {
+        "type": "paragraph",
+        "text": "Tired of dull, lifeless hair? These natural haircare tips will help restore shine and vitality."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Weekly Routine"
+      },
+      {
+        "type": "list",
+        "style": "unordered",
+        "items": [
+          "Gentle shampooing: Use mild cleansers to keep natural oils.",
+          "Deep conditioning: Once a week, use hydrating masks.",
+          "Avoiding heat: Air dry when possible and use heat protectants."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "DIY Hair Masks"
+      },
+      {
+        "type": "paragraph",
+        "text": "Try mixtures of coconut oil, honey, and aloe vera for added moisture and strength."
+      },
+      {
+        "type": "tip",
+        "text": "Hydrate from within by drinking plenty of water daily."
+      }
+    ]
+  },
+  "summer-makeup-trends": {
+    "id": "002",
+    "slug": "summer-makeup-trends",
+    "title": "Top Summer Makeup Trends to Try Now",
+    "date": "August 12, 2025",
+    "author": "Neha Verma",
+    "badge": "Makeup",
+    "hero": "https://res.cloudinary.com/dv9s7sm0x/image/upload/v1755926019/bridalmakeup1_f0cedx.jpg",
+    "excerpt": "Explore light, bold looks and must-have products to keep your makeup fresh and fun all summer.",
+    "quickTips": [
+      "Opt for lightweight, dewy foundations.",
+      "Glow with highlighters and shimmer eyeshadows.",
+      "Experiment with bold lip colors like coral and fuchsia.",
+      "Use waterproof mascara to withstand the heat.",
+      "Keep touch-up products handy for fresh looks."
+    ],
+    "content": [
+      {
+        "type": "paragraph",
+        "text": "Get ready to shine with the hottest summer makeup trends tailored for warm weather."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Foundation & Base"
+      },
+      {
+        "type": "paragraph",
+        "text": "Choose lightweight, breathable formulas for natural glow without heaviness."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Color Play"
+      },
+      {
+        "type": "list",
+        "style": "unordered",
+        "items": [
+          "Vibrant eyeshadows in pinks and oranges.",
+          "Glossy lips to catch the light."
+        ]
+      },
+      {
+        "type": "pullquote",
+        "text": "Less is more when summer heat meets your makeup brush."
+      },
+      {
+        "type": "tip",
+        "text": "Always set makeup with a light, mattifying spray to maintain freshness."
+      }
+    ]
+  },
+  "night-skincare-essentials": {
+    "id": "003",
+    "slug": "night-skincare-essentials",
+    "title": "Night Skincare Essentials for Radiant Skin",
+    "date": "August 15, 2025",
+    "author": "Dermatology Today",
+    "badge": "Skincare",
+    "hero": "https://res.cloudinary.com/dv9s7sm0x/image/upload/v1756296119/facial_basic_cuuqx0.jpg",
+    "excerpt": "Unlock the secret to brighter, healthier skin with a simple nightly routine and must-have ingredients.",
+    "quickTips": [
+      "Cleanse thoroughly to remove SPF and makeup.",
+      "Use retinol or other exfoliating treatments 2-3 times a week.",
+      "Apply hydrating serums with hyaluronic acid.",
+      "Moisturize generously to lock in nutrients.",
+      "Don’t forget the delicate eye area with a targeted cream."
+    ],
+    "content": [
+      {
+        "type": "paragraph",
+        "text": "Nighttime is when your skin repairs itself — make the most of it with this essential routine."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Step-by-Step"
+      },
+      {
+        "type": "list",
+        "style": "unordered",
+        "items": [
+          "Cleansing: Double cleanse for a deep clean.",
+          "Treatment: Use retinol or acids carefully.",
+          "Hydration: Hyaluronic acid helps retain moisture.",
+          "Moisturizing: Choose a cream suited for your skin type."
+        ]
+      },
+      {
+        "type": "tip",
+        "text": "Consistency is key — stick to your night routine daily for best results."
+      }
+    ]
+  }
+}
