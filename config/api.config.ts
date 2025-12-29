@@ -17,7 +17,17 @@
 // FOR PRODUCTION: Use https://feminiq-backend.onrender.com
 //
 // Current setting:
-export const BASE_URL = "http://localhost:3000"; // Android Emulator default
+const getLocalIp = () => {
+    // Try to get the IP from Expo Constants (debuggerHost)
+    // Retrieve debugger host IP in development mode. Use a type‑cast to avoid TypeScript errors when the property is missing in the EmbeddedManifest type.
+    const host = "192.168.1.6"; // fallback to manual IP if unavailable
+    return host;
+};
+
+export const BASE_URL =
+    process.env.NODE_ENV === "production"
+        ? "https://feminiq-backend.onrender.com"
+        : `http://${getLocalIp()}:3000`;
 
 /**
  * Helper function to construct full API URLs

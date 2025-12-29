@@ -71,7 +71,7 @@
     },
     "runtimeVersion": "1.0.0",
     "updates": {
-      "url": "https://u.expo.dev/474e2e87-ce79-4c3e-8233-38fd653c3afd"
+      "enabled": false
     }
   }
 }

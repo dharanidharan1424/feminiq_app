@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import CustomInput from "@/components/CustomInput";
 import GenderModal from "@/components/Profile/GenderModal";
-import { getApiUrl } from "@/config/api.config";
 import indiaStatesCities from "@/constants/Locations2.json";
 import { useAuth } from "@/context/UserContext";
 import { Ionicons } from "@expo/vector-icons";
@@ -151,13 +150,15 @@ const Update: React.FC = () => {
 
     try {
       showModal("Updating Profile", "", true);
+      setIsLoading(true);
       const response = await fetch(
-        getApiUrl("/update-profile"),
+        "http://192.168.1.6:3000/update-profile/",
         {
           method: "POST",
           credentials: "include",
           headers: {
             "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
           },
           body: JSON.stringify(newProfile),
         }
