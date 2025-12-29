@@ -1,47 +1,20 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React from "react";
 import {
   ImageBackground,
   ScrollView,
   StatusBar,
   Text,
-  TouchableOpacity,
-  View,
+  TouchableOpacity
 } from "react-native";
-import { Wave } from "react-native-animated-spinkit";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { LinearGradient } from "expo-linear-gradient";
 
 const WelcomeScreen = () => {
-  const [checkingToken, setCheckingToken] = useState(false);
-
-  const handleNext = async () => {
-    setCheckingToken(true);
-    try {
-      const token = await AsyncStorage.getItem("token");
-      if (token) {
-        router.replace("/Tabs");
-      } else {
-        router.push("/CarouselScreen");
-      }
-    } catch (error) {
-      console.error("Error reading token:", error);
-      router.push("/CarouselScreen");
-    } finally {
-      setCheckingToken(false);
-    }
+  const handleNext = () => {
+    // Always navigate to CarouselScreen to show authentication flow
+    router.push("/CarouselScreen");
   };
-
-  if (checkingToken) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Wave color="#FF5ACC" />
-      </View>
-    );
-  }
-
-  if (checkingToken) return null;
 
   return (
     <SafeAreaView style={{ flex: 1 }}>

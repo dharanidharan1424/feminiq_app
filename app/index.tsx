@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import React, { useEffect } from "react";
-import { Platform, View } from "react-native";
-import * as Notifications from "expo-notifications";
 import WelcomeScreen from "@/screens/WelcomeScreen";
+import * as Notifications from "expo-notifications";
+import { useEffect } from "react";
+import { Platform, View } from "react-native";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -25,6 +25,8 @@ const index = () => {
       }).catch(console.error);
     }
   }, []);
+
+
 
   return (
     <View className="flex-1">

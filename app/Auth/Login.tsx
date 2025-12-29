@@ -1,9 +1,12 @@
 import CustomInput from "@/components/CustomInput";
+import { getApiUrl } from "@/config/api.config";
 import { images } from "@/constants";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 
+import FacebookLogin from "@/components/Auth/FacebookLogin";
+import GoogleLogin from "@/components/Auth/GoogleLogin";
 import {
   Alert,
   Modal,
@@ -12,10 +15,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useAuth } from "../../context/UserContext";
 import { Chase } from "react-native-animated-spinkit";
-import FacebookLogin from "@/components/Auth/FacebookLogin";
-import GoogleLogin from "@/components/Auth/GoogleLogin";
+import { useAuth } from "../../context/UserContext";
 
 const Login = () => {
   const { setToken, updateProfile, isDarkMode } = useAuth();
@@ -50,7 +51,7 @@ const Login = () => {
     handleModal("Loading...", "Please wait while we log you in.");
     try {
       const response = await fetch(
-        "https://feminiq-backend.onrender.com/login",
+        getApiUrl("/login"),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -76,6 +77,7 @@ const Login = () => {
         router.push("/Tabs");
       } else {
         handleModal("Login Failed", json.message || "Invalid credentials");
+
       }
     } catch (error) {
       console.error("Login fetch error:", error);

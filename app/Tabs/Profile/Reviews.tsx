@@ -1,22 +1,23 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-  Alert,
-  TextInput,
-  Modal,
-  StyleSheet,
-} from "react-native";
+import { getApiUrl } from "@/config/api.config";
+import { useAuth } from "@/context/UserContext";
 import {
   Ionicons,
   MaterialCommunityIcons,
   MaterialIcons,
 } from "@expo/vector-icons";
-import { useAuth } from "@/context/UserContext";
 import { router } from "expo-router";
+import React, { useEffect, useState } from "react";
+import {
+  Alert,
+  Image,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 type Review = {
   id: number;
@@ -78,7 +79,7 @@ const ReviewsScreen: React.FC = () => {
       setLoading(true);
       try {
         const res = await fetch(
-          `https://feminiq-backend.onrender.com/reviews/user/${profile.id}`
+          `${getApiUrl("/reviews/user")}/${profile.id}`
         );
         if (!res.ok) throw new Error("Failed to load reviews");
         const json = await res.json();
@@ -118,7 +119,7 @@ const ReviewsScreen: React.FC = () => {
     }
     try {
       const res = await fetch(
-        `https://feminiq-backend.onrender.com/reviews/${editReview.id}`,
+        `${getApiUrl("/reviews")}/${editReview.id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -165,7 +166,7 @@ const ReviewsScreen: React.FC = () => {
     if (!profile) return;
     try {
       const res = await fetch(
-        `https://feminiq-backend.onrender.com/reviews/${id}`,
+        `${getApiUrl("/reviews")}/${id}`,
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
@@ -196,9 +197,8 @@ const ReviewsScreen: React.FC = () => {
 
       <View className="flex-row justify-around mb-6">
         <TouchableOpacity
-          className={`px-5 py-2 rounded-full flex-row items-center gap-1 ${
-            activeTab === "byYou" ? "bg-primary" : "bg-gray-300"
-          }`}
+          className={`px-5 py-2 rounded-full flex-row items-center gap-1 ${activeTab === "byYou" ? "bg-primary" : "bg-gray-300"
+            }`}
           onPress={() => setActiveTab("byYou")}
         >
           <Ionicons
@@ -207,17 +207,15 @@ const ReviewsScreen: React.FC = () => {
             color={activeTab === "byYou" ? "white" : "black"}
           />
           <Text
-            className={`text-center font-poppins-medium ${
-              activeTab === "byYou" ? "text-white" : "text-black"
-            }`}
+            className={`text-center font-poppins-medium ${activeTab === "byYou" ? "text-white" : "text-black"
+              }`}
           >
             You to artists
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          className={`px-5 py-2 rounded-full flex-row items-center gap-1 ${
-            activeTab === "toYou" ? "bg-primary" : "bg-gray-300"
-          }`}
+          className={`px-5 py-2 rounded-full flex-row items-center gap-1 ${activeTab === "toYou" ? "bg-primary" : "bg-gray-300"
+            }`}
           onPress={() => setActiveTab("toYou")}
         >
           <Ionicons
@@ -226,9 +224,8 @@ const ReviewsScreen: React.FC = () => {
             color={activeTab === "toYou" ? "white" : "black"}
           />
           <Text
-            className={`text-center font-poppins-medium  ${
-              activeTab === "toYou" ? "text-white" : "text-black"
-            }`}
+            className={`text-center font-poppins-medium  ${activeTab === "toYou" ? "text-white" : "text-black"
+              }`}
           >
             Artists to You
           </Text>

@@ -1,29 +1,29 @@
-import React, { useState, useCallback, useEffect } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  Image,
-  Switch,
-  Modal,
-  TextInput,
-  KeyboardAvoidingView,
-  Platform,
-  BackHandler,
-  Pressable,
-  Alert,
-} from "react-native";
+import { ReportBookingModal } from "@/components/Booking/ReportBookingModal";
+import CustomInput from "@/components/CustomInput";
+import { useAuth } from "@/context/UserContext";
 import {
   FontAwesome5,
   Ionicons,
   MaterialCommunityIcons,
+  MaterialIcons,
 } from "@expo/vector-icons";
-import { useAuth } from "@/context/UserContext";
-import { router } from "expo-router";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import CustomInput from "@/components/CustomInput";
-import { Chase, Wave } from "react-native-animated-spinkit";
+import { router } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  BackHandler,
+  Image,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  Switch,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from "react-native";
+import { Wave } from "react-native-animated-spinkit";
 
 type BookingStatus = "Upcoming" | "Completed" | "Cancelled";
 const TABS: BookingStatus[] = ["Upcoming", "Completed", "Cancelled"];
@@ -504,147 +504,6 @@ export function AlertModal2({
   );
 }
 
-export function ReportBookingIssueModal({
-  visible,
-  onClose,
-  booking, // { orderId, service, staff, location }
-}: {
-  visible: boolean;
-  onClose: () => void;
-  booking: {
-    orderId?: string | number;
-    service?: string;
-    staff?: string;
-    location?: string;
-    [key: string]: any;
-  };
-}) {
-  const { profile } = useAuth();
-  const [subject, setSubject] = useState("");
-  const [description, setDescription] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async () => {
-    if (!subject || !description) {
-      Alert.alert("Please fill out all required fields.");
-      return;
-    }
-    setLoading(true);
-    try {
-      const res = await fetch("https://feminiq-backend.onrender.com/report", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          user_id: profile?.id,
-          user_name: profile?.fullname,
-          report_type: "Order Issue",
-          subject,
-          message: description,
-          order_ref: booking?.orderId,
-        }),
-      });
-      const json = await res.json();
-      if (json.success) {
-        Alert.alert("Success", "Report submitted successfully!");
-        setSubject("");
-        setDescription("");
-        onClose();
-      } else {
-        Alert.alert("Error", json.error || "Error submitting report.");
-      }
-    } catch (e) {
-      console.log(e);
-      Alert.alert("Error", "Network error.");
-    }
-    setLoading(false);
-  };
-
-  return (
-    <Modal
-      transparent
-      visible={visible}
-      animationType="fade"
-      onRequestClose={onClose}
-    >
-      <View className="flex-1 justify-center items-center bg-black/40">
-        <View className="w-11/12 max-w-md bg-white rounded-2xl p-5 shadow-lg">
-          {/* Close Button */}
-          <Pressable className="absolute top-4 right-4 z-10" onPress={onClose}>
-            <Text className="text-2xl text-gray-400">×</Text>
-          </Pressable>
-
-          {/* Header */}
-          <Text className="text-2xl font-poppins-semibold text-center mb-4 text-black">
-            Report Booking Issue
-          </Text>
-
-          {/* Booking Details */}
-          <View className="bg-gray-100 rounded-lg p-4 mb-4">
-            <Text className="text-base font-poppins-regular mb-1">
-              <Text className="font-poppins-medium">Order ID: </Text>
-              {booking.orderId}
-            </Text>
-            <Text className="text-base font-poppins-regular mb-1">
-              <Text className="font-poppins-medium">Service: </Text>
-              {booking.service}
-            </Text>
-            <Text className="text-base font-poppins-regular mb-1">
-              <Text className="font-poppins-medium">Staff: </Text>
-              {booking.staff}
-            </Text>
-            <Text className="text-base font-poppins-regular">
-              <Text className="font-poppins-medium">Location: </Text>
-              {booking.location}
-            </Text>
-          </View>
-
-          {/* Subject Input */}
-          <Text className="mb-1 text-gray-700 font-poppins-semibold">
-            Subject
-          </Text>
-          <TextInput
-            className="border rounded-lg px-4 py-2 mb-3 bg-gray-50 text-base font-poppins-regular"
-            placeholder="Brief summary"
-            placeholderTextColor="#888"
-            value={subject}
-            onChangeText={setSubject}
-            editable={!loading}
-          />
-
-          {/* Description Input */}
-          <Text className="mb-1 text-gray-700 font-poppins-semibold">
-            Describe the issue
-          </Text>
-          <TextInput
-            className="border rounded-lg px-4 py-2 mb-4 bg-gray-50 text-base h-20 font-poppins-regular"
-            placeholder="Provide details"
-            placeholderTextColor="#888"
-            value={description}
-            onChangeText={setDescription}
-            multiline
-            editable={!loading}
-          />
-
-          {/* Send Button */}
-          <TouchableOpacity
-            className={`bg-pink-400 rounded-lg py-3 items-center ${loading ? "opacity-60" : ""}`}
-            disabled={loading}
-            onPress={handleSubmit}
-          >
-            {loading ? (
-              <Chase color="#fff" size={20} />
-            ) : (
-              <Text className="text-white font-poppins-semibold text-lg">
-                Send Report
-              </Text>
-            )}
-          </TouchableOpacity>
-        </View>
-      </View>
-    </Modal>
-  );
-}
-
 /* -------------------------------
    Main Booking Page Component
 -------------------------------- */
@@ -713,9 +572,18 @@ export default function BookingPage() {
 
   // Fetch bookings from API
   const fetchBookings = useCallback(() => {
-    if (!profile?.id) return;
+    if (!profile?.id) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
-    fetch(`https://feminiq-backend.onrender.com/booking/user/${profile.id}`)
+
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), 10000); // 10 seconds timeout
+
+    fetch(`https://feminiq-backend.onrender.com/booking/user/${profile.id}`, {
+      signal: controller.signal,
+    })
       .then((res) => res.json())
       .then((data) => {
         if (data.bookings) {
@@ -748,8 +616,17 @@ export default function BookingPage() {
           }
         }
       })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        if (err.name === "AbortError") {
+          console.log("Fetch bookings request timed out");
+        } else {
+          console.error("Fetch bookings error:", err);
+        }
+      })
+      .finally(() => {
+        clearTimeout(id);
+        setLoading(false);
+      });
   }, [profile?.id, wasRejectedShown, wasApprovedShown]);
 
   // initial fetch
@@ -951,9 +828,8 @@ export default function BookingPage() {
         {/* Header */}
         <View className="flex-row items-center justify-between px-5 pt-5 mb-3">
           <Text
-            className={`font-poppins-semibold text-2xl ${
-              isDarkMode ? "text-white" : "text-black"
-            }`}
+            className={`font-poppins-semibold text-2xl ${isDarkMode ? "text-white" : "text-black"
+              }`}
           >
             My Booking
           </Text>
@@ -970,22 +846,20 @@ export default function BookingPage() {
             <TouchableOpacity
               key={tab}
               onPress={() => setSelected(tab)}
-              className={`rounded-full px-6 py-2 mx-2 border ${
-                selected === tab
-                  ? "bg-primary/20 border-primary"
-                  : isDarkMode
-                    ? "border-gray-600 bg-gray-800"
-                    : "border-primary/50 bg-white"
-              }`}
+              className={`rounded-full px-6 py-2 mx-2 border ${selected === tab
+                ? "bg-primary/20 border-primary"
+                : isDarkMode
+                  ? "border-gray-600 bg-gray-800"
+                  : "border-primary/50 bg-white"
+                }`}
             >
               <Text
-                className={`font-poppins-semibold text-sm ${
-                  selected === tab
-                    ? "text-primary"
-                    : isDarkMode
-                      ? "text-gray-300"
-                      : "text-primary"
-                }`}
+                className={`font-poppins-semibold text-sm ${selected === tab
+                  ? "text-primary"
+                  : isDarkMode
+                    ? "text-gray-300"
+                    : "text-primary"
+                  }`}
               >
                 {tab}
               </Text>
@@ -997,9 +871,8 @@ export default function BookingPage() {
         <ScrollView className="px-4 flex-1">
           {filtered.length === 0 && !loading && (
             <Text
-              className={`text-center font-poppins-semibold mt-10 text-lg ${
-                isDarkMode ? "text-gray-400" : "text-gray-400"
-              }`}
+              className={`text-center font-poppins-semibold mt-10 text-lg ${isDarkMode ? "text-gray-400" : "text-gray-400"
+                }`}
             >
               No bookings found.
             </Text>
@@ -1017,14 +890,12 @@ export default function BookingPage() {
             if (selected === "Completed") {
               badge = (
                 <View
-                  className={`ml-auto mb-2 px-3 py-2 rounded-full ${
-                    isDarkMode ? "bg-green-800" : "bg-green-100"
-                  }`}
+                  className={`ml-auto mb-2 px-3 py-2 rounded-full ${isDarkMode ? "bg-green-800" : "bg-green-100"
+                    }`}
                 >
                   <Text
-                    className={`text-xs font-poppins-semibold ${
-                      isDarkMode ? "text-green-300" : "text-green-700"
-                    }`}
+                    className={`text-xs font-poppins-semibold ${isDarkMode ? "text-green-300" : "text-green-700"
+                      }`}
                   >
                     Completed
                   </Text>
@@ -1039,14 +910,12 @@ export default function BookingPage() {
             } else if (selected === "Cancelled") {
               badge = (
                 <View
-                  className={`ml-auto mb-2 px-3 py-1 rounded-full ${
-                    isDarkMode ? "bg-red-900" : "bg-red-100"
-                  }`}
+                  className={`ml-auto mb-2 px-3 py-1 rounded-full ${isDarkMode ? "bg-red-900" : "bg-red-100"
+                    }`}
                 >
                   <Text
-                    className={`text-xs font-poppins-semibold ${
-                      isDarkMode ? "text-red-400" : "text-red-500"
-                    }`}
+                    className={`text-xs font-poppins-semibold ${isDarkMode ? "text-red-400" : "text-red-500"
+                      }`}
                   >
                     Cancelled
                   </Text>
@@ -1137,22 +1006,20 @@ export default function BookingPage() {
             return (
               <TouchableOpacity
                 onPress={getStaffDetails}
-                className={`rounded-3xl shadow shadow-black/10 my-2 p-4 pb-4 relative ${
-                  isDarkMode
-                    ? disableActions2
-                      ? "bg-red-900 border border-red-700"
-                      : "bg-gray-800"
-                    : disableActions2
-                      ? "bg-red-100 border border-red-500"
-                      : "bg-white"
-                }`}
+                className={`rounded-3xl shadow shadow-black/10 my-2 p-4 pb-4 relative ${isDarkMode
+                  ? disableActions2
+                    ? "bg-red-900 border border-red-700"
+                    : "bg-gray-800"
+                  : disableActions2
+                    ? "bg-red-100 border border-red-500"
+                    : "bg-white"
+                  }`}
                 key={booking.id || idx}
               >
                 <View className="flex-row justify-between items-center mb-1">
                   <Text
-                    className={`font-poppins-semibold text-base ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
-                    }`}
+                    className={`font-poppins-semibold text-base ${isDarkMode ? "text-gray-300" : "text-gray-700"
+                      }`}
                   >
                     {formatDateTime(booking.date, booking.time)}
                   </Text>
@@ -1163,9 +1030,8 @@ export default function BookingPage() {
                       selected === "Upcoming" && (
                         <View className="flex-row items-center">
                           <Text
-                            className={`mr-1 text-xs font-poppins-regular ${
-                              isDarkMode ? "text-gray-400" : "text-gray-500"
-                            }`}
+                            className={`mr-1 text-xs font-poppins-regular ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                              }`}
                           >
                             Remind me
                           </Text>
@@ -1224,7 +1090,7 @@ export default function BookingPage() {
                       )}
                   </View>
 
-                  <ReportBookingIssueModal
+                  <ReportBookingModal
                     visible={reportModalVisible}
                     onClose={() => setReportModalVisible(false)}
                     booking={{
@@ -1239,24 +1105,22 @@ export default function BookingPage() {
 
                   {showCancel && booking.reschedule_status && (
                     <View
-                      className={`self-start mb-2 px-3 py-1 rounded-full flex-row items-center ${
-                        booking.reschedule_status === "pending"
-                          ? isDarkMode
-                            ? "bg-yellow-900"
-                            : "bg-yellow-100"
-                          : "bg-red-100"
-                      }`}
+                      className={`self-start mb-2 px-3 py-1 rounded-full flex-row items-center ${booking.reschedule_status === "pending"
+                        ? isDarkMode
+                          ? "bg-yellow-900"
+                          : "bg-yellow-100"
+                        : "bg-red-100"
+                        }`}
                     >
                       <Text
-                        className={`text-xs font-poppins-semibold ${
-                          booking.reschedule_status === "pending"
-                            ? isDarkMode
-                              ? "text-yellow-300"
-                              : "text-yellow-600"
-                            : isDarkMode
-                              ? "text-red-400"
-                              : "text-red-600"
-                        }`}
+                        className={`text-xs font-poppins-semibold ${booking.reschedule_status === "pending"
+                          ? isDarkMode
+                            ? "text-yellow-300"
+                            : "text-yellow-600"
+                          : isDarkMode
+                            ? "text-red-400"
+                            : "text-red-600"
+                          }`}
                       >
                         {booking.reschedule_status === "pending"
                           ? "Reschedule Pending"
@@ -1281,24 +1145,32 @@ export default function BookingPage() {
                     <View className="w-16 h-16 rounded-2xl mr-3 bg-pink-100" />
                   )}
                   <View className="flex-1">
+                    <View className="flex-row items-center">
+                      <Text
+                        className={`font-poppins-semibold text-lg mb-1 ${isDarkMode ? "text-white" : "text-gray-900"
+                          }`}
+                      >
+                        {booking.staff_name}
+                      </Text>
+                      {booking.rating && (
+                        <View className="flex-row items-center ml-2 mb-1">
+                          <MaterialIcons name="star" size={14} color="#FF5ACC" />
+                          <Text className="text-xs font-poppins-medium text-[#FF5ACC] ml-0.5">
+                            {Number(booking.rating).toFixed(1)}
+                            {booking.reviews_count ? ` (${booking.reviews_count})` : ""}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
                     <Text
-                      className={`font-poppins-semibold text-lg mb-1 ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                      }`}
-                    >
-                      {booking.staff_name}
-                    </Text>
-                    <Text
-                      className={`text-sm mb-0.5 font-poppins-regular ${
-                        isDarkMode ? "text-gray-400" : "text-gray-500"
-                      }`}
+                      className={`text-sm mb-0.5 font-poppins-regular ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                        }`}
                     >
                       {booking.service_at}
                     </Text>
                     <Text
-                      className={`text-xs font-poppins-regular ${
-                        isDarkMode ? "text-gray-500" : "text-gray-600"
-                      }`}
+                      className={`text-xs font-poppins-regular ${isDarkMode ? "text-gray-500" : "text-gray-600"
+                        }`}
                     >
                       Services:
                     </Text>
@@ -1328,17 +1200,15 @@ export default function BookingPage() {
                     <>
                       {showCancel && (
                         <TouchableOpacity
-                          className={`flex-1 mr-2 border border-primary py-2 items-center ${
-                            disableActions2
-                              ? "bg-red-100 border border-red-500 rounded-lg"
-                              : "bg-primary/10 rounded-full"
-                          }`}
+                          className={`flex-1 mr-2 border border-primary py-2 items-center ${disableActions2
+                            ? "bg-red-100 border border-red-500 rounded-lg"
+                            : "bg-primary/10 rounded-full"
+                            }`}
                           onPress={() => openCancelModal(booking)}
                         >
                           <Text
-                            className={`font-poppins-medium text-xs ${
-                              disableActions2 ? "text-red-500" : "text-primary"
-                            }`}
+                            className={`font-poppins-medium text-xs ${disableActions2 ? "text-red-500" : "text-primary"
+                              }`}
                           >
                             Cancel Booking
                           </Text>
@@ -1346,19 +1216,17 @@ export default function BookingPage() {
                       )}
                       {showCancel && !disableActions2 && (
                         <TouchableOpacity
-                          className={`flex-1 mx-2 border rounded-full py-2 items-center ${
-                            isWithin24Hours(booking)
-                              ? "bg-gray-300 border-gray-400"
-                              : "border-primary bg-primary/20"
-                          }`}
+                          className={`flex-1 mx-2 border rounded-full py-2 items-center ${isWithin24Hours(booking)
+                            ? "bg-gray-300 border-gray-400"
+                            : "border-primary bg-primary/20"
+                            }`}
                           onPress={() => handleReschedulePress(booking)}
                         >
                           <Text
-                            className={`font-poppins-medium text-xs ${
-                              isWithin24Hours(booking)
-                                ? "text-gray-500"
-                                : "text-primary"
-                            }`}
+                            className={`font-poppins-medium text-xs ${isWithin24Hours(booking)
+                              ? "text-gray-500"
+                              : "text-primary"
+                              }`}
                           >
                             Reschedule
                           </Text>
@@ -1496,9 +1364,9 @@ export default function BookingPage() {
                       value={
                         rescheduleTime
                           ? rescheduleTime.toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })
                           : "Select New Time"
                       }
                       editable={false}

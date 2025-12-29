@@ -1,18 +1,17 @@
-import CustomInput from "@/components/CustomInput";
+import { getApiUrl } from "@/config/api.config";
 import { useAuth } from "@/context/UserContext";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
+  Alert,
   ScrollView,
   StyleSheet,
   Switch,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
-  Modal,
-  Alert,
+  View
 } from "react-native";
 
 const OTP_BOXES = 6;
@@ -69,7 +68,7 @@ const Security: React.FC = () => {
     setLoading(true);
     try {
       const res = await fetch(
-        "https://feminiq-backend.onrender.com/otp/send-otp",
+        getApiUrl("/otp/send-otp"),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -133,7 +132,7 @@ const Security: React.FC = () => {
     try {
       // Verify OTP
       const res = await fetch(
-        "https://feminiq-backend.onrender.com/otp/verify-otp",
+        getApiUrl("/otp/verify-otp"),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -148,7 +147,7 @@ const Security: React.FC = () => {
         setShowOtpModal(false);
         setLoading(true);
         const changeRes = await fetch(
-          "https://feminiq-backend.onrender.com/pass/change-password",
+          getApiUrl("/pass/change-password"),
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -242,232 +241,7 @@ const Security: React.FC = () => {
           />
         </View>
 
-        <TouchableOpacity
-          style={[
-            styles.button,
-            {
-              backgroundColor: isDarkMode
-                ? "rgba(255, 90, 204, 0.2)"
-                : "#FCE9F4",
-            },
-          ]}
-          onPress={() => setModalVisible(true)}
-          disabled={loading}
-        >
-          <Text style={[styles.buttonText, { color: "#FF5ACC" }]}>
-            Change Password
-          </Text>
-        </TouchableOpacity>
       </ScrollView>
-
-      {/* Password Change Modal */}
-      <Modal
-        visible={modalVisible}
-        transparent
-        statusBarTranslucent
-        animationType="fade"
-        onRequestClose={() => !loading && setModalVisible(false)}
-      >
-        <View style={styles.modalBackdrop}>
-          <View
-            style={{
-              backgroundColor: isDarkMode ? "#333" : "#fff",
-              borderRadius: 12,
-              padding: 24,
-              width: "100%",
-              maxWidth: 360,
-              alignItems: "center",
-              gap: 10,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 20,
-                fontFamily: "Poppins_600SemiBold",
-                marginBottom: 12,
-                color: isDarkMode ? "#eee" : "#222",
-                textAlign: "center",
-              }}
-            >
-              Change Password
-            </Text>
-
-            <CustomInput
-              placeholder="Current Password"
-              value={currPassword}
-              onChangeText={setCurrPassword}
-              leftIconName="lock-closed"
-              rightIconName={
-                secureTextEntry ? "eye-off-outline" : "eye-outline"
-              }
-              secureTextEntry={secureTextEntry}
-              onRightIconPress={() => setSecureTextEntry((prev) => !prev)}
-              error={errors.curr}
-              isDarkMode={isDarkMode}
-              placeholderTextColor={isDarkMode ? "#bbb" : "#999"}
-              editable={!loading}
-              isEditing={true}
-            />
-
-            <CustomInput
-              placeholder="New Password"
-              value={newPassword}
-              onChangeText={setNewPassword}
-              leftIconName="lock-closed"
-              rightIconName={
-                secureTextEntry ? "eye-off-outline" : "eye-outline"
-              }
-              secureTextEntry={secureTextEntry}
-              onRightIconPress={() => setSecureTextEntry((prev) => !prev)}
-              error={errors.new}
-              isDarkMode={isDarkMode}
-              placeholderTextColor={isDarkMode ? "#bbb" : "#999"}
-              editable={!loading}
-              isEditing={true}
-            />
-
-            <CustomInput
-              placeholder="Confirm Password"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              leftIconName="lock-closed"
-              rightIconName={
-                secureTextEntry ? "eye-off-outline" : "eye-outline"
-              }
-              secureTextEntry={secureTextEntry}
-              onRightIconPress={() => setSecureTextEntry((prev) => !prev)}
-              error={errors.confirm}
-              isDarkMode={isDarkMode}
-              placeholderTextColor={isDarkMode ? "#bbb" : "#999"}
-              editable={!loading}
-              isEditing={true}
-            />
-
-            {!!modalMsg && (
-              <Text
-                style={{
-                  color: modalMsg.includes("success") ? "#22c55e" : "#f87171",
-                  fontFamily: "Poppins_400Regular",
-                  fontSize: 14,
-                  marginBottom: 8,
-                  textAlign: "center",
-                }}
-              >
-                {modalMsg}
-              </Text>
-            )}
-
-            <TouchableOpacity
-              style={{
-                backgroundColor: loading ? "#fcacd7" : "#FF5ACC",
-                paddingVertical: 12,
-                borderRadius: 8,
-                width: "100%",
-                marginTop: 8,
-                alignItems: "center",
-              }}
-              onPress={handleChangePassword}
-              disabled={loading}
-            >
-              <Text
-                style={{
-                  color: "#fff",
-                  fontFamily: "Poppins_600SemiBold",
-                  fontSize: 16,
-                }}
-              >
-                {loading ? "Sending OTP..." : "Send OTP"}
-              </Text>
-            </TouchableOpacity>
-
-            {!loading && (
-              <TouchableOpacity
-                style={{
-                  alignSelf: "center",
-                  marginTop: 8,
-                  borderRadius: 8,
-                  width: "100%",
-                  marginBottom: 4,
-                  alignItems: "center",
-                  paddingVertical: 12,
-                }}
-                className="bg-primary/10 "
-                onPress={() => setModalVisible(false)}
-              >
-                <Text
-                  style={{
-                    color: "#FF5ACC",
-                    fontFamily: "Poppins_400Regular",
-                  }}
-                >
-                  Cancel
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-      </Modal>
-
-      {/* OTP Input Modal */}
-      <Modal
-        visible={showOtpModal}
-        transparent
-        statusBarTranslucent
-        animationType="slide"
-      >
-        <View style={styles.modalBackdrop}>
-          <View
-            style={[
-              styles.modalContainer,
-              { backgroundColor: isDarkMode ? "#333" : "#fff" },
-            ]}
-          >
-            <Text
-              style={[styles.otpTitle, { color: isDarkMode ? "#eee" : "#222" }]}
-            >
-              Enter OTP
-            </Text>
-            <Text
-              style={[styles.otpDesc, { color: isDarkMode ? "#ccc" : "#444" }]}
-            >
-              Enter the verification code sent to {"\n"}
-              <Text style={styles.otpEmail}>{profile?.email}</Text>
-            </Text>
-            <View style={styles.otpBoxes}>
-              {Array.from({ length: OTP_BOXES }).map((_, i) => (
-                <TextInput
-                  key={i}
-                  ref={(ref) => (inputRefs.current[i] = ref)}
-                  value={otp[i] || ""}
-                  keyboardType="number-pad"
-                  maxLength={1}
-                  onChangeText={(text) => handleOtpChange(text, i)}
-                  onKeyPress={(e) => handleOtpKeyPress(e, i)}
-                  style={styles.otpInput}
-                  autoFocus={i === 0}
-                />
-              ))}
-            </View>
-            <Text style={styles.otpResend} onPress={sendOtp}>
-              Didn’t get a code?{" "}
-              <Text
-                style={{ color: "#ff5acc", textDecorationLine: "underline" }}
-              >
-                resend
-              </Text>
-            </Text>
-            <TouchableOpacity
-              style={styles.verifyButton}
-              onPress={verifyOtpAndChangePassword}
-              disabled={otpLoading}
-            >
-              <Text style={styles.verifyButtonText}>
-                {otpLoading ? "Verifying..." : "Verify OTP"}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
     </>
   );
 };

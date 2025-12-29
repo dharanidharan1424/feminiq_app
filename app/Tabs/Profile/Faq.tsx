@@ -1,7 +1,7 @@
 import { useAuth } from "@/context/UserContext";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -11,56 +11,77 @@ import {
   View,
 } from "react-native";
 
+
 const faqItems = [
   {
-    question: "What is the purpose of the app?",
+    question: "What is Feminiq and how does it work?",
     answer:
-      "Feminiq helps users find, book, and review services. It streamlines booking and support for personal service providers.",
+      "Feminiq is a beauty and wellness booking platform that connects you with professional Artists offering a wide range of services - including Makeup, Bridal Makeup, Manicure, Pedicure, Threading, Mehndi, and more. Simply browse available Artists, book your preferred service, and enjoy it at your home or preferred location.",
   },
   {
-    question: "How do I delete an account?",
+    question: "How do I Create an account?",
     answer:
-      "Navigate to Profile > Delete Account and follow the on-screen instructions, including selecting your reasons.",
+      "Tap Create an Account in Log In, enter your details, verify your email, and start booking instantly.",
   },
   {
-    question: "How do I book an appointment?",
+    question: "Can I reshedule or cancel my booking?",
     answer:
-      "Browse available providers, select one, choose a service, and pick your schedule to make a booking.",
+      "Yes. Go to My Bookings, select your appointment, and choose Reschedule or Cancel. Read the Cancellation and Reschedule Policy for further information.",
   },
   {
-    question: "Can I reschedule or cancel a booking?",
+    question: "What payment methods are supported?",
     answer:
-      "Yes. Go to 'My Bookings' in your profile and select the booking to reschedule or cancel following app prompts.",
+      "We currently accept UPI, debit/credit cards, and net banking. Feminiq supports digital payments only at this time.",
   },
   {
-    question: "How do I pay for services?",
+    question: "How do I rate or review a service provider?",
     answer:
-      "Payments can be made via integrated online payment options during booking, or in-person as chosen.",
+      "After your session, open the Artist Profile, scroll to the Reviews section, and share your feedback along with a star rating.",
   },
   {
-    question: "How do I leave a review for a service provider?",
+    question: "How do I apply offers or promo code?",
     answer:
-      "After your service appointment, you can leave a review through the provider's profile or your completed bookings section.",
+      "Enter your promo code at checkout before making the payment to apply your discount instantly.",
   },
   {
-    question: "How is my personal information protected?",
+    question: "is my payment and data secure?",
     answer:
-      "Feminiq follows strict privacy protocols and uses encryption to keep your data secure and private.",
+      "Absolutely! Feminiq uses end-to-end encryption and secure payment gateways for all transactions. Your personal information is stored safely and used only to improve our platform and user experience.",
   },
   {
-    question: "How can I contact customer support?",
+    question: "can I book at a different address?",
     answer:
-      "Email feminiqcustomersupport@Feminiq.com or call 98123 00001 for any inquiries.",
+      "Yes. During booking, you can select an Alternate Address before making the payment.",
   },
   {
-    question: "How do I report a bug or technical issue?",
+    question: "How do I report an issue?",
     answer:
-      "Contact support via email or the app's feedback system from Profile > Help & Feedback.",
+      "Go to My Profile -> Report a Problem after logging in, or contact our support team directly through email.",
   },
   {
-    question: "Can I edit or delete my review?",
+    question: "How do I report an issue with mybooking or about the Artist?",
     answer:
-      "Yes, visit your profile's review section to edit or remove reviews as needed.",
+      "Click the three dots (⋮) on your booking card, choose Report, and describe the issue.",
+  },
+  {
+    question: "What happen if the Artist is late or doesn't show up?",
+    answer:
+      "If your Artist is late or fails to arrive, you can report the issue from your booking. Our support team will help you resolve the issue.",
+  },
+  {
+    question: "Do Artists bring their own tools and products?",
+    answer:
+      "Yes, all registered Feminiq Artists bring their own professional-grade tools and products to ensure hygiene and quality service.",
+  },
+  {
+    question: "How do I contact customer support?",
+    answer:
+      "You can reach us anytime at support@feminiq.inYes, all registered Feminiq Artists bring their own professional-grade tools and products to ensure hygiene and quality service.",
+  },
+  {
+    question: "Where is feminiq available?",
+    answer:
+      "Feminiq is currently available in Chennai. We’re expanding rapidly - stay tuned for updates on new locations!",
   },
 ];
 

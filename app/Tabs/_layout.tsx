@@ -2,7 +2,6 @@ import Header from "@/components/Header";
 import { useAuth } from "@/context/UserContext";
 import { Entypo, Ionicons, MaterialIcons, Octicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import React from "react";
 import { StatusBar } from "react-native";
 
 const _layout = () => {

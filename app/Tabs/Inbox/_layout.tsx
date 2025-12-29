@@ -1,8 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { Slot, useRouter } from "expo-router";
 import React from "react";
-import { Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { View } from "react-native";
 import "../../globals.css";
 
 import { useAuth } from "@/context/UserContext";
@@ -13,7 +12,6 @@ import {
   Poppins_700Bold,
   useFonts,
 } from "@expo-google-fonts/poppins";
-import { Ionicons } from "@expo/vector-icons";
 import { Wave } from "react-native-animated-spinkit";
 
 const _layout = () => {

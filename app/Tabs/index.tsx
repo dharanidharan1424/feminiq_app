@@ -4,11 +4,13 @@ import HeroCarousel from "@/components/Home/Herocarousel";
 import NearbyLocation from "@/components/Home/NearbyLocation";
 import Popular from "@/components/Home/Popular";
 import ServicesSlider from "@/components/Home/ServicesSlider";
+import { getApiUrl } from "@/config/api.config";
 import { images } from "@/constants";
 import { useAuth } from "@/context/UserContext";
 import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
+import * as Notifications from "expo-notifications";
 import { router, useFocusEffect } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
@@ -16,21 +18,20 @@ import {
   BackHandler,
   FlatList,
   Image,
+  LayoutRectangle,
   Linking,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  LayoutRectangle,
-  Pressable,
 } from "react-native";
-import Modal from "react-native-modal";
 import { Pulse } from "react-native-animated-spinkit";
-import * as Notifications from "expo-notifications";
+import Modal from "react-native-modal";
 
-const STAFFS_API = "https://feminiq-backend.onrender.com/api/get-staffs";
+const STAFFS_API = getApiUrl("/api/get-staffs");
 
 const SERVICES = [
   { title: "All", categoryId: null },
@@ -144,7 +145,7 @@ const Index = () => {
             [
               {
                 text: "Cancel",
-                onPress: () => {}, // do nothing
+                onPress: () => { }, // do nothing
                 style: "cancel",
               },
               {
@@ -352,7 +353,7 @@ const Index = () => {
             // Ensure you have user profile and token
             try {
               const response = await fetch(
-                "https://feminiq-backend.onrender.com/login/savePushToken",
+                getApiUrl("/login/savePushToken"),
                 {
                   method: "POST",
                   headers: {
@@ -416,7 +417,7 @@ const Index = () => {
         </View>
 
         {/* Search Input w/ filter */}
-        <View style={[styles.searchWrapper, { position: "relative" }]}>
+        <View style={[styles.searchWrapper, { position: "relative", flexDirection: 'row', alignItems: 'center' }]}>
           <CustomInput
             placeholder="Search by Artist, Service or Location"
             value={search}
@@ -427,43 +428,30 @@ const Index = () => {
             isEditing={true}
           />
 
-          {search.length > 0 && (
-            <View>
+          <View style={{ flexDirection: 'row', position: 'absolute', right: 10, alignItems: 'center' }}>
+            {search.length > 0 && (
               <TouchableOpacity
-                style={{
-                  position: "absolute",
-                  right: 10, // Adjust spacing so it doesn't overlap filter
-
-                  transform: [{ translateY: -12 }],
-                  zIndex: 2,
-                }}
                 onPress={() => setSearch("")}
+                style={{ marginRight: 10 }}
               >
                 <Feather
                   name="x-circle"
-                  size={24}
+                  size={20}
                   color={isDarkMode ? "#fff" : "#333"}
                 />
               </TouchableOpacity>
+            )}
 
-              <TouchableOpacity
-                style={{
-                  position: "absolute",
-                  right: 50,
-
-                  transform: [{ translateY: -12 }], // Adjust according to icon and input height
-                  zIndex: 2,
-                }}
-                onPress={() => setFilterModalVisible(true)}
-              >
-                <Ionicons
-                  name="filter"
-                  size={24}
-                  color={isDarkMode ? "#fff" : "#333"}
-                />
-              </TouchableOpacity>
-            </View>
-          )}
+            <TouchableOpacity
+              onPress={() => setFilterModalVisible(true)}
+            >
+              <Ionicons
+                name="filter"
+                size={24}
+                color={isDarkMode ? "#fff" : "#333"}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {search.trim() === "" && (
@@ -783,19 +771,17 @@ const Index = () => {
               {["Provider Location", "Your Location"].map((opt) => (
                 <TouchableOpacity
                   key={opt}
-                  className={`flex-1 mx-1 py-1 rounded-full border items-center ${
-                    selectedServiceAt === opt
-                      ? "bg-[#FF5ACC] border-[#FF5ACC]"
-                      : "bg-transparent border-[#FF5ACC]"
-                  }`}
+                  className={`flex-1 mx-1 py-1 rounded-full border items-center ${selectedServiceAt === opt
+                    ? "bg-[#FF5ACC] border-[#FF5ACC]"
+                    : "bg-transparent border-[#FF5ACC]"
+                    }`}
                   onPress={() => setSelectedServiceAt(opt)}
                 >
                   <Text
-                    className={`${
-                      selectedServiceAt === opt
-                        ? "text-white "
-                        : "text-[#FF5ACC] "
-                    }font-poppins-regular`}
+                    className={`${selectedServiceAt === opt
+                      ? "text-white "
+                      : "text-[#FF5ACC] "
+                      }font-poppins-regular`}
                   >
                     {opt}
                   </Text>
@@ -811,19 +797,17 @@ const Index = () => {
               {["All", "Solo", "Studio"].map((opt) => (
                 <TouchableOpacity
                   key={opt}
-                  className={`flex-1 mx-1 py-1 rounded-full border items-center flex-row justify-center ${
-                    selectedProfType === opt
-                      ? "bg-[#FF5ACC] border-[#FF5ACC]"
-                      : "bg-transparent border-[#FF5ACC]"
-                  }`}
+                  className={`flex-1 mx-1 py-1 rounded-full border items-center flex-row justify-center ${selectedProfType === opt
+                    ? "bg-[#FF5ACC] border-[#FF5ACC]"
+                    : "bg-transparent border-[#FF5ACC]"
+                    }`}
                   onPress={() => setSelectedProfType(opt)}
                 >
                   <Text
-                    className={`${
-                      selectedProfType === opt
-                        ? "text-white"
-                        : "text-[#FF5ACC] "
-                    } font-poppins-regular`}
+                    className={`${selectedProfType === opt
+                      ? "text-white"
+                      : "text-[#FF5ACC] "
+                      } font-poppins-regular`}
                   >
                     {opt}
                   </Text>
@@ -853,11 +837,10 @@ const Index = () => {
               {["All", "5", "4", "3", "2"].map((opt) => (
                 <TouchableOpacity
                   key={opt}
-                  className={`flex-1 mx-1 py-1 flex-row items-center justify-center rounded-full border ${
-                    selectedRating === opt
-                      ? "bg-[#FF5ACC] border-[#FF5ACC]"
-                      : "bg-transparent border-[#FF5ACC]"
-                  }`}
+                  className={`flex-1 mx-1 py-1 flex-row items-center justify-center rounded-full border ${selectedRating === opt
+                    ? "bg-[#FF5ACC] border-[#FF5ACC]"
+                    : "bg-transparent border-[#FF5ACC]"
+                    }`}
                   onPress={() => setSelectedRating(opt)}
                 >
                   <View
@@ -897,19 +880,17 @@ const Index = () => {
               {["< 1 km", "1 - 5 km", "5 - 10 km", "> 10 km"].map((opt) => (
                 <TouchableOpacity
                   key={opt}
-                  className={`flex-1 mx-1 py-2 px-4 rounded-full border items-center ${
-                    selectedDistance === opt
-                      ? "bg-[#FF5ACC] border-[#FF5ACC]"
-                      : "bg-transparent border-[#FF5ACC]"
-                  }`}
+                  className={`flex-1 mx-1 py-2 px-4 rounded-full border items-center ${selectedDistance === opt
+                    ? "bg-[#FF5ACC] border-[#FF5ACC]"
+                    : "bg-transparent border-[#FF5ACC]"
+                    }`}
                   onPress={() => setSelectedDistance(opt)}
                 >
                   <Text
-                    className={`font-poppins-medium text-sm ${
-                      selectedDistance === opt
-                        ? "text-white"
-                        : "text-[#FF5ACC] "
-                    }`}
+                    className={`font-poppins-medium text-sm ${selectedDistance === opt
+                      ? "text-white"
+                      : "text-[#FF5ACC] "
+                      }`}
                   >
                     {opt}
                   </Text>

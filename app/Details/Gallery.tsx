@@ -20,7 +20,7 @@ const { width, height } = Dimensions.get("window");
 const numColumns = 3;
 const IMAGE_SIZE = (width - 50) / numColumns;
 
-const Gallery = ({ data }) => {
+const Gallery = ({ data }: { data: any }) => {
   const [images, setImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -87,8 +87,8 @@ const Gallery = ({ data }) => {
     PanResponder.create({
       onMoveShouldSetPanResponder: (evt, gestureState) =>
         gestureState.numberActiveTouches === 2 ||
-        gestureState.dx !== 0 ||
-        gestureState.dy !== 0,
+        Math.abs(gestureState.dx) > 10 ||
+        Math.abs(gestureState.dy) > 10,
       onPanResponderMove: (evt, gestureState) => {
         if (gestureState.numberActiveTouches === 2) {
           const touches = evt.nativeEvent.touches;
@@ -103,12 +103,16 @@ const Gallery = ({ data }) => {
           translateY.setValue(gestureState.dy);
         }
       },
-      onPanResponderRelease: () => {
-        Animated.parallel([
-          Animated.spring(scale, { toValue: 1, useNativeDriver: true }),
-          Animated.spring(translateX, { toValue: 0, useNativeDriver: true }),
-          Animated.spring(translateY, { toValue: 0, useNativeDriver: true }),
-        ]).start();
+      onPanResponderRelease: (evt, gestureState) => {
+        if (gestureState.dy > 100) {
+          closeModal();
+        } else {
+          Animated.parallel([
+            Animated.spring(scale, { toValue: 1, useNativeDriver: true }),
+            Animated.spring(translateX, { toValue: 0, useNativeDriver: true }),
+            Animated.spring(translateY, { toValue: 0, useNativeDriver: true }),
+          ]).start();
+        }
       },
       onPanResponderTerminationRequest: () => true,
     })

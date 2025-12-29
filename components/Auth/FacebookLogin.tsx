@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { TouchableOpacity, Text, Image, Modal, View } from "react-native";
-import { AccessToken, LoginManager, Settings } from "react-native-fbsdk-next";
+import { Image, Modal, Text, TouchableOpacity, View } from "react-native";
 import { Chase } from "react-native-animated-spinkit";
+import { AccessToken, LoginManager, Settings } from "react-native-fbsdk-next";
 
 type Props = {
   onLoginSuccess: (user: any, token: string) => void;
@@ -29,8 +29,14 @@ const FacebookLogin: React.FC<Props> = ({
   const buttonBorder = isDarkMode ? "#555" : "#d1d5db";
 
   useEffect(() => {
-    Settings.initializeSDK();
+    try {
+      Settings.initializeSDK();
+    } catch (error) {
+      console.warn("Facebook SDK initialization failed:", error);
+      // SDK not available, but app should still load
+    }
   }, []);
+
 
   const handleModal = (
     type: "loading" | "success" | "error",

@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import CustomInput from "@/components/CustomInput";
 import GenderModal from "@/components/Profile/GenderModal";
+import { getApiUrl } from "@/config/api.config";
+import indiaStatesCities from "@/constants/Locations2.json";
 import { useAuth } from "@/context/UserContext";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
-import indiaStatesCities from "@/constants/Locations2.json";
 import { Dropdown } from "react-native-element-dropdown";
 
 import {
@@ -68,6 +69,9 @@ const Update: React.FC = () => {
   const [modalDoorNo, setModalDoorNo] = useState("");
   const [modalPincode, setModalPincode] = useState("");
   const [modalLandmark, setModalLandmark] = useState("");
+
+  // Toggle for "Same as Main Address"
+  const [sameAsMainAddress, setSameAsMainAddress] = useState(false);
 
   // Cloudinary upload preset and URL
   const uploadToCloudinary = async (
@@ -148,7 +152,7 @@ const Update: React.FC = () => {
     try {
       showModal("Updating Profile", "", true);
       const response = await fetch(
-        "https://feminiq-backend.onrender.com/update-profile",
+        getApiUrl("/update-profile"),
         {
           method: "POST",
           credentials: "include",
@@ -220,6 +224,7 @@ const Update: React.FC = () => {
 
   const openAddressModal = (type: "address" | "altaddress") => {
     setModalAddressType(type);
+    setSameAsMainAddress(false); // Reset toggle when opening modal
     const addrToParse = type === "address" ? addr : addr2;
 
     if (addrToParse && addrToParse.trim() !== "") {
@@ -607,6 +612,97 @@ const Update: React.FC = () => {
                 {modalAddressType === "address" ? "Address" : "Alt. Address"}
               </Text>
 
+              {/* Toggle for "Same as Main Address" - only show for alternative address */}
+              {modalAddressType === "altaddress" && (
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginBottom: 16,
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    backgroundColor: isDarkMode ? "#333" : "#f5f5f5",
+                    borderRadius: 8,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontFamily: "Poppins_500Medium",
+                      color: isDarkMode ? "#eee" : "#222",
+                    }}
+                  >
+                    Same as Main Address
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      const newValue = !sameAsMainAddress;
+                      setSameAsMainAddress(newValue);
+
+                      if (newValue && addr && addr.trim() !== "") {
+                        // Copy main address to alternative address fields
+                        const parts = addr.split(",");
+                        const doorNo = parts[0]?.trim() || "";
+                        const street = parts[1]?.trim() || "";
+                        const area = parts[2]?.trim() || "";
+                        const city = parts[3]?.trim() || "";
+
+                        let state = "";
+                        let pincode = "";
+                        let landmark = "";
+
+                        if (parts[4]) {
+                          const stateZip = parts[4].split("-").map((s) => s.trim());
+                          state = stateZip[0] || "";
+                          pincode = stateZip[1] || "";
+                        }
+                        if (parts[5]) {
+                          landmark = parts[5].replace(/^Landmark:\s*/, "").trim();
+                        }
+
+                        setModalDoorNo(doorNo);
+                        setModalStreet(street);
+                        setModalArea(area);
+                        setModalCity(city);
+                        setModalState(
+                          Object.keys(indiaStatesCities).includes(state) ? state : ""
+                        );
+                        setModalPincode(pincode);
+                        setModalLandmark(landmark);
+                      } else if (!newValue) {
+                        // Clear fields when toggle is turned off
+                        setModalDoorNo("");
+                        setModalStreet("");
+                        setModalArea("");
+                        setModalCity("");
+                        setModalState("");
+                        setModalPincode("");
+                        setModalLandmark("");
+                      }
+                    }}
+                    style={{
+                      width: 50,
+                      height: 28,
+                      borderRadius: 14,
+                      backgroundColor: sameAsMainAddress ? "#ff5acc" : "#ccc",
+                      justifyContent: "center",
+                      paddingHorizontal: 2,
+                    }}
+                  >
+                    <View
+                      style={{
+                        width: 24,
+                        height: 24,
+                        borderRadius: 12,
+                        backgroundColor: "#fff",
+                        alignSelf: sameAsMainAddress ? "flex-end" : "flex-start",
+                      }}
+                    />
+                  </TouchableOpacity>
+                </View>
+              )}
+
               {/* State Dropdown */}
               <Dropdown
                 style={{
@@ -627,7 +723,7 @@ const Update: React.FC = () => {
                   setModalState(item.value);
                   setModalCity(""); // Reset city when state changes
                 }}
-                disable={!isEditing}
+                disable={!isEditing || (modalAddressType === "altaddress" && sameAsMainAddress)}
               />
 
               {/* City Dropdown */}
@@ -647,7 +743,7 @@ const Update: React.FC = () => {
                 fontFamily="Poppins_400Regular"
                 value={modalCity}
                 onChange={(item: any) => setModalCity(item.value)}
-                disable={!modalState}
+                disable={!modalState || (modalAddressType === "altaddress" && sameAsMainAddress)}
               />
 
               <CustomInput
@@ -656,6 +752,7 @@ const Update: React.FC = () => {
                 onChangeText={setModalArea}
                 isDarkMode={isDarkMode}
                 isEditing={isEditing}
+                editable={!(modalAddressType === "altaddress" && sameAsMainAddress)}
               />
 
               <CustomInput
@@ -664,6 +761,7 @@ const Update: React.FC = () => {
                 onChangeText={setModalStreet}
                 isDarkMode={isDarkMode}
                 isEditing={isEditing}
+                editable={!(modalAddressType === "altaddress" && sameAsMainAddress)}
               />
 
               <CustomInput
@@ -672,6 +770,7 @@ const Update: React.FC = () => {
                 onChangeText={setModalDoorNo}
                 isDarkMode={isDarkMode}
                 isEditing={isEditing}
+                editable={!(modalAddressType === "altaddress" && sameAsMainAddress)}
               />
 
               <CustomInput
@@ -684,6 +783,7 @@ const Update: React.FC = () => {
                 keyboardType="numeric"
                 isDarkMode={isDarkMode}
                 isEditing={isEditing}
+                editable={!(modalAddressType === "altaddress" && sameAsMainAddress)}
               />
 
               <CustomInput
@@ -692,6 +792,7 @@ const Update: React.FC = () => {
                 onChangeText={setModalLandmark}
                 isDarkMode={isDarkMode}
                 isEditing={isEditing}
+                editable={!(modalAddressType === "altaddress" && sameAsMainAddress)}
               />
 
               <View

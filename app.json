@@ -5,7 +5,6 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "feminiq",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -13,7 +12,16 @@
       "icon": "./assets/images/icon.png",
       "bundleIdentifier": "",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you.",
+        "SKAdNetworkItems": [
+          {
+            "SKAdNetworkIdentifier": "v9wttpbfk9.skadnetwork"
+          },
+          {
+            "SKAdNetworkIdentifier": "n38lu8286q.skadnetwork"
+          }
+        ]
       }
     },
     "android": {
@@ -28,7 +36,13 @@
         }
       },
       "edgeToEdgeEnabled": true,
-      "package": ""
+      "package": "com.anonymous.feminiq",
+      "permissions": [
+        "android.permission.INTERNET",
+        "com.google.android.gms.permission.AD_ID",
+        "android.permission.INTERNET",
+        "com.google.android.gms.permission.AD_ID"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -46,19 +60,6 @@
           "backgroundColor": "#FF5ACC"
         }
       ],
-      "expo-web-browser",
-      [
-        "react-native-fbsdk-next",
-        {
-          "appID": "Own-id",
-          "clientToken": "Own-token",
-          "displayName": "Login with Facebook",
-          "advertiserIDCollectionEnabled": false,
-          "autoLogAppEventsEnabled": false,
-          "isAutoInitEnabled": true,
-          "iosUserTrackingPermission": "This identifier will be used to deliver personalized ads to you."
-        }
-      ],
       "expo-tracking-transparency"
     ],
     "experiments": {
@@ -66,9 +67,7 @@
     },
     "extra": {
       "router": {},
-      "eas": {
-        "projectId": "Create YOUR ID"
-      }
+      "razorpayKeyId": "rzp_test_your_key_id"
     },
     "runtimeVersion": "1.0.0",
     "updates": {

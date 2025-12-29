@@ -1,13 +1,13 @@
+import { getApiUrl } from "@/config/api.config";
 import { useAuth } from "@/context/UserContext";
 import {
-  Entypo,
   Feather,
   FontAwesome5,
   Ionicons,
-  MaterialIcons,
+  MaterialIcons
 } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useState, useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import {
   Alert,
   Image,
@@ -16,13 +16,136 @@ import {
   Switch,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { Chase } from "react-native-animated-spinkit";
 import Modal from "react-native-modal";
-import { GoogleSignin } from "@react-native-google-signin/google-signin";
+// import { GoogleSignin } from "@react-native-google-signin/google-signin";
+console.log("PROFILE INDEX FILE LOADED 🔥");
 // Import the new component
 import DeleteAccountModal from "@/components/Profile/DeleteAccountModal"; // Adjust path as needed
+
+// FAQ items for guest view
+const faqItems = [
+  {
+    question: "What is Feminiq and how does it work?",
+    answer:
+      "Feminiq is a beauty and wellness booking platform that connects you with professional Artists offering a wide range of services - including Makeup, Bridal Makeup, Manicure, Pedicure, Threading, Mehndi, and more. Simply browse available Artists, book your preferred service, and enjoy it at your home or preferred location.",
+  },
+  {
+    question: "How do I Create an account?",
+    answer:
+      "Tap Create an Account in Log In, enter your details, verify your email, and start booking instantly.",
+  },
+  {
+    question: "Can I reshedule or cancel my booking?",
+    answer:
+      "Yes. Go to My Bookings, select your appointment, and choose Reschedule or Cancel. Read the Cancellation and Reschedule Policy for further information.",
+  },
+  {
+    question: "What payment methods are supported?",
+    answer:
+      "We currently accept UPI, debit/credit cards, and net banking. Feminiq supports digital payments only at this time.",
+  },
+  {
+    question: "How do I contact customer support?",
+    answer:
+      "You can reach us anytime at support@feminiq.in",
+  },
+];
+
+const ProfileIndex: React.FC = () => {
+  const { token, profile } = useAuth();
+
+  console.log("🔍 ProfileIndex - Full token:", token);
+  console.log("🔍 ProfileIndex - Token type:", typeof token);
+  console.log("🔍 ProfileIndex - Profile data:", profile);
+  console.log("🔍 ProfileIndex - Will render:", !token ? "GuestProfileView" : "ProfileScreen");
+
+  if (!token) {
+    return <GuestProfileView />;
+  }
+
+  return <ProfileScreen />;
+};
+
+// Guest Profile View Component
+const GuestProfileView: React.FC = () => {
+  const { isDarkMode } = useAuth();
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  const backgroundColor = isDarkMode ? "#222" : "#fff";
+  const textColor = isDarkMode ? "#eee" : "#222";
+  const answerTextColor = isDarkMode ? "#bbb" : "#555";
+
+  return (
+    <ScrollView
+      contentContainerStyle={[
+        styles.guestContainer,
+        { backgroundColor },
+      ]}
+    >
+      <View style={styles.guestHeader}>
+        <Ionicons
+          name="person-circle-outline"
+          size={80}
+          color={isDarkMode ? "#999" : "#ccc"}
+        />
+        <Text style={[styles.guestTitle, { color: textColor }]}>
+          Welcome to Feminiq
+        </Text>
+        <Text style={[styles.guestSubtitle, { color: answerTextColor }]}>
+          Sign up to access your profile and book services
+        </Text>
+      </View>
+
+      <View style={styles.faqSection}>
+        <Text style={[styles.faqSectionTitle, { color: textColor }]}>
+          Frequently Asked Questions
+        </Text>
+        {faqItems.map((item, idx) => (
+          <View key={idx}>
+            <TouchableOpacity
+              style={styles.faqItem}
+              onPress={() => setOpenIndex(openIndex === idx ? null : idx)}
+              activeOpacity={0.8}
+            >
+              <Text style={[styles.faqQuestion, { color: textColor }]}>
+                {item.question}
+              </Text>
+              <Ionicons
+                name={openIndex === idx ? "chevron-up" : "chevron-down"}
+                size={20}
+                color="#FF5ACC"
+              />
+            </TouchableOpacity>
+            {openIndex === idx && (
+              <Text style={[styles.faqAnswer, { color: answerTextColor }]}>
+                {item.answer}
+              </Text>
+            )}
+          </View>
+        ))}
+      </View>
+
+      <TouchableOpacity
+        style={styles.signupButton}
+        onPress={() => router.push("/Auth/SignUp")}
+      >
+        <Text style={styles.signupButtonText}>Sign up to create profile</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.loginButton}
+        onPress={() => router.push("/Auth/Login")}
+      >
+        <Text style={[styles.loginButtonText, { color: "#FF5ACC" }]}>
+          Already have an account? Sign in
+        </Text>
+      </TouchableOpacity>
+    </ScrollView>
+  );
+};
 
 // --- Component Definition for ProfileMenu (remains the same) ---
 type ProfileMenuProps = {
@@ -109,14 +232,16 @@ const ProfileScreen: React.FC = () => {
     setLogoutModalStage("loading");
 
     try {
+      /*
       // Google Signout logic
       const currentUser = await GoogleSignin.getCurrentUser();
       if (currentUser) {
         await GoogleSignin.signOut();
       }
+      */
 
       // Backend logout call
-      await fetch("https://feminiq-backend.onrender.com/logout", {
+      await fetch(getApiUrl("/logout"), {
         method: "POST",
       });
 
@@ -143,7 +268,7 @@ const ProfileScreen: React.FC = () => {
   ): Promise<string | null> => {
     try {
       const response = await fetch(
-        "https://feminiq-backend.onrender.com/delete-profile",
+        getApiUrl("/delete-profile"),
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
@@ -174,8 +299,8 @@ const ProfileScreen: React.FC = () => {
   };
 
   const toggleTheme = useCallback(() => {
-    setIsDarkMode((prev: any) => !prev);
-  }, [setIsDarkMode]);
+    setIsDarkMode(!isDarkMode);
+  }, [isDarkMode, setIsDarkMode]);
 
   return (
     <>
@@ -280,19 +405,6 @@ const ProfileScreen: React.FC = () => {
           />
           <ProfileMenu
             icon={
-              <Entypo
-                name="language"
-                size={18}
-                color={isDarkMode ? "#fff" : "#222"}
-              />
-            }
-            text="Language"
-            rightText={language}
-            onPress={() => router.push("/Tabs/Profile/Language")}
-            isDarkMode={isDarkMode}
-          />
-          <ProfileMenu
-            icon={
               <Ionicons
                 name="moon-outline"
                 size={18}
@@ -308,7 +420,19 @@ const ProfileScreen: React.FC = () => {
           <ProfileMenu
             icon={
               <MaterialIcons
-                name="flag"
+                name="cancel"
+                size={18}
+                color={isDarkMode ? "#fff" : "#222"}
+              />
+            }
+            text="Cancellation"
+            onPress={() => router.push("/Tabs/Profile/Cancellation")}
+            isDarkMode={isDarkMode}
+          />
+          <ProfileMenu
+            icon={
+              <MaterialIcons
+                name="report"
                 size={18}
                 color={isDarkMode ? "#fff" : "#222"}
               />
@@ -317,7 +441,6 @@ const ProfileScreen: React.FC = () => {
             onPress={() => router.push("/Tabs/Profile/Report")}
             isDarkMode={isDarkMode}
           />
-
           <ProfileMenu
             icon={
               <Feather
@@ -618,6 +741,99 @@ const styles = StyleSheet.create({
     textAlign: "left",
     marginBottom: 10,
   },
+  // Guest View Styles
+  guestContainer: {
+    flexGrow: 1,
+    padding: 20,
+    paddingBottom: 40,
+  },
+  guestHeader: {
+    alignItems: "center",
+    marginTop: 20,
+    marginBottom: 30,
+  },
+  guestTitle: {
+    fontSize: 24,
+    fontFamily: "Poppins_600SemiBold",
+    marginTop: 16,
+    textAlign: "center",
+  },
+  guestSubtitle: {
+    fontSize: 15,
+    fontFamily: "Poppins_400Regular",
+    marginTop: 8,
+    textAlign: "center",
+    paddingHorizontal: 20,
+  },
+  faqSection: {
+    marginTop: 10,
+    marginBottom: 30,
+  },
+  faqSectionTitle: {
+    fontSize: 18,
+    fontFamily: "Poppins_600SemiBold",
+    marginBottom: 16,
+  },
+  faqItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+  },
+  faqQuestion: {
+    fontSize: 14,
+    fontFamily: "Poppins_500Medium",
+    flex: 1,
+    paddingRight: 10,
+  },
+  faqAnswer: {
+    fontSize: 13,
+    fontFamily: "Poppins_400Regular",
+    marginTop: 8,
+    marginBottom: 12,
+    lineHeight: 20,
+    paddingLeft: 4,
+  },
+  signupButton: {
+    backgroundColor: "#FF5ACC",
+    paddingVertical: 16,
+    borderRadius: 25,
+    alignItems: "center",
+    marginTop: 20,
+  },
+  signupButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontFamily: "Poppins_600SemiBold",
+  },
+  loginButton: {
+    paddingVertical: 12,
+    alignItems: "center",
+    marginTop: 12,
+  },
+  loginButtonText: {
+    fontSize: 14,
+    fontFamily: "Poppins_400Regular",
+  },
 });
 
-export default ProfileScreen;
+// Main component with authentication check
+// Main component with authentication check
+const ProfileTabScreen: React.FC = () => {
+  const { token } = useAuth();
+
+  console.log("🔍 ProfileTabScreen - Token exists:", !!token);
+  console.log("🔍 ProfileTabScreen - Will render:", !token ? "GuestProfileView" : "ProfileScreen");
+
+  // If no token, show guest view
+  if (!token) {
+    return <GuestProfileView />;
+  }
+
+  // If logged in, show full profile
+  return <ProfileScreen />;
+};
+
+export default ProfileTabScreen;

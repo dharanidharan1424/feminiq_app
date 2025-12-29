@@ -1,30 +1,31 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { getApiUrl } from "@/config/api.config";
+import { useAuth } from "@/context/UserContext";
+import { decryptData, encryptData } from "@/utils/Encryption";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  View,
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  ActivityIndicator,
-  Alert,
-  Modal,
-  Pressable,
+  View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import { useAuth } from "@/context/UserContext";
-import { encryptData, decryptData } from "@/utils/Encryption";
 
-const API_URL = "https://feminiq-backend.onrender.com/bank";
+const API_URL = getApiUrl("/bank");
 
 const isValidIfsc = (ifsc: string) =>
   /^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifsc.trim());
-const isValidUpi = (upi: string) => upi.trim().length > 0;
-const isValidAccount = (acc: string) => acc.trim().length >= 6;
+const isValidUpi = (upi: string) => upi.trim().length > 0 && upi.includes("@");
+const isValidAccount = (acc: string) => acc.trim().length >= 9 && acc.trim().length <= 18;
 
 const BankUpiFormScreen: React.FC = () => {
   const { profile } = useAuth();
@@ -94,12 +95,12 @@ const BankUpiFormScreen: React.FC = () => {
           setLastUpdated(
             d.updated_at
               ? new Date(d.updated_at).toLocaleString("en-GB", {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })
               : ""
           );
           if (isValidIfsc(d.ifsc_code || "")) {
@@ -108,7 +109,7 @@ const BankUpiFormScreen: React.FC = () => {
             setValidIfsc(null);
           }
         }
-      } catch {}
+      } catch { }
     };
     loadData();
   }, [profile?.id]);
@@ -192,6 +193,9 @@ const BankUpiFormScreen: React.FC = () => {
           <Text className="flex-1 text-center text-gray-600 font-poppins-semibold text-lg">
             🏦 Bank / UPI Details
           </Text>
+          <TouchableOpacity onPress={() => Alert.alert("Info", "Bank and UPI details are used for secure payouts and refunds.")}>
+            <Ionicons name="information-circle-outline" size={24} color="#FF5ACC" />
+          </TouchableOpacity>
         </View>
 
         <View className="my-7 rounded-xl border border-gray-300 p-6 shadow-md bg-white mx-4">
@@ -200,13 +204,12 @@ const BankUpiFormScreen: React.FC = () => {
             IFSC Code *
           </Text>
           <View
-            className={`flex-row items-center rounded-lg border px-3 py-2 mb-4 ${
-              ifscValidation.borderColor === "green"
-                ? "border-green-500"
-                : ifscValidation.borderColor === "red"
-                  ? "border-red-500"
-                  : "border-gray-300"
-            }`}
+            className={`flex-row items-center rounded-lg border px-3 py-2 mb-4 ${ifscValidation.borderColor === "green"
+              ? "border-green-500"
+              : ifscValidation.borderColor === "red"
+                ? "border-red-500"
+                : "border-gray-300"
+              }`}
           >
             <TextInput
               className="flex-1 font-poppins-regular py-1"
@@ -225,9 +228,8 @@ const BankUpiFormScreen: React.FC = () => {
               <TouchableOpacity
                 disabled={!isValidIfsc(ifscCode) || loading}
                 onPress={verifyIfsc}
-                className={`ml-3 rounded-md px-4 py-1 ${
-                  isValidIfsc(ifscCode) ? "bg-green-600" : "bg-gray-300"
-                }`}
+                className={`ml-3 rounded-md px-4 py-1 ${isValidIfsc(ifscCode) ? "bg-green-600" : "bg-gray-300"
+                  }`}
               >
                 <Text className="text-white font-poppins-semibold">Verify</Text>
               </TouchableOpacity>
@@ -277,13 +279,12 @@ const BankUpiFormScreen: React.FC = () => {
             Account Number *
           </Text>
           <View
-            className={`flex-row items-center rounded-lg border px-3 py-2 mb-6 ${
-              accountValidation.borderColor === "green"
-                ? "border-green-500"
-                : accountValidation.borderColor === "red"
-                  ? "border-red-500"
-                  : "border-gray-300"
-            }`}
+            className={`flex-row items-center rounded-lg border px-3 py-2 mb-6 ${accountValidation.borderColor === "green"
+              ? "border-green-500"
+              : accountValidation.borderColor === "red"
+                ? "border-red-500"
+                : "border-gray-300"
+              }`}
           >
             <TextInput
               className="flex-1  font-poppins-regular py-1"
@@ -322,13 +323,12 @@ const BankUpiFormScreen: React.FC = () => {
             UPI ID *
           </Text>
           <View
-            className={`flex-row items-center rounded-lg border px-3 py-2 mb-4 ${
-              upiValidation.borderColor === "green"
-                ? "border-green-500"
-                : upiValidation.borderColor === "red"
-                  ? "border-red-500"
-                  : "border-gray-300"
-            }`}
+            className={`flex-row items-center rounded-lg border px-3 py-2 mb-4 ${upiValidation.borderColor === "green"
+              ? "border-green-500"
+              : upiValidation.borderColor === "red"
+                ? "border-red-500"
+                : "border-gray-300"
+              }`}
           >
             <TextInput
               className="flex-1 py-1 font-poppins-regular"
@@ -351,9 +351,8 @@ const BankUpiFormScreen: React.FC = () => {
           <TouchableOpacity
             onPress={handleSubmit}
             disabled={loading}
-            className={`rounded-xl py-4 items-center ${
-              loading ? "bg-green-400" : "bg-green-600"
-            }`}
+            className={`rounded-xl py-4 items-center ${loading ? "bg-green-400" : "bg-green-600"
+              }`}
           >
             <Text className="text-white font-poppins-semibold text-lg">
               {loading ? "Saving..." : "Update Details"}

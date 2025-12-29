@@ -74,45 +74,47 @@ const CarouselScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={{ flex: 3 }}>
-        <FlatList
-          data={data}
-          renderItem={({ item }) => <Carousel item={item} />}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          pagingEnabled
-          bounces={false}
-          keyExtractor={(item) => item.id}
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-            { useNativeDriver: false }
-          )}
-          scrollEventThrottle={32}
-          onViewableItemsChanged={viewItemChanged}
-          viewabilityConfig={viewConfig}
-          ref={slidesRef}
-          snapToInterval={screenWidth} // snap exactly on screen width
-          decelerationRate="fast" // smooth fast snap
-          snapToAlignment="start"
-        />
+      <View style={styles.innerContainer}>
+        <View style={{ flex: 3 }}>
+          <FlatList
+            data={data}
+            renderItem={({ item }) => <Carousel item={item} />}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            pagingEnabled
+            bounces={false}
+            keyExtractor={(item) => item.id}
+            onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+              { useNativeDriver: false }
+            )}
+            scrollEventThrottle={32}
+            onViewableItemsChanged={viewItemChanged}
+            viewabilityConfig={viewConfig}
+            ref={slidesRef}
+            snapToInterval={screenWidth} // snap exactly on screen width
+            decelerationRate="fast" // smooth fast snap
+            snapToAlignment="start"
+          />
+        </View>
+        <Paginator color="#FF5ACC" data={data} scrollX={scrollX} />
+        <TouchableOpacity
+          onPress={() => router.push("/Auth/SignUp")}
+          style={{
+            backgroundColor: "#FF5ACC",
+            width: "100%",
+            padding: 10,
+            margin: 10,
+            marginTop: 10,
+            borderRadius: 50,
+            alignItems: "center",
+          }}
+        >
+          <Text style={{ fontFamily: "Poppins_600SemiBold", color: "white" }}>
+            Get Started
+          </Text>
+        </TouchableOpacity>
       </View>
-      <Paginator color="#FF5ACC" data={data} scrollX={scrollX} />
-      <TouchableOpacity
-        onPress={() => router.push("/Auth")}
-        style={{
-          backgroundColor: "#FF5ACC",
-          width: "100%",
-          padding: 10,
-          margin: 10,
-          marginTop: 10,
-          borderRadius: 50,
-          alignItems: "center",
-        }}
-      >
-        <Text style={{ fontFamily: "Poppins_600SemiBold", color: "white" }}>
-          Get Started
-        </Text>
-      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -120,10 +122,15 @@ const CarouselScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "white",
+  },
+  innerContainer: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
     paddingVertical: 10,
     paddingHorizontal: 10,
+    backgroundColor: "white",
   },
 });
 

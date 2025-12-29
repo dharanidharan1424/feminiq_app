@@ -1,18 +1,19 @@
+import { getApiUrl } from "@/config/api.config";
 import { useAuth } from "@/context/UserContext";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
   Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 
@@ -64,7 +65,7 @@ const Report = () => {
     }
     setLoading(true);
     try {
-      const res = await fetch("https://feminiq-backend.onrender.com/report", {
+      const res = await fetch(getApiUrl("/report"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

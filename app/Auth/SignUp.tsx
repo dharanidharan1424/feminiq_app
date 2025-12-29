@@ -1,3 +1,11 @@
+import FacebookLogin from "@/components/Auth/FacebookLogin";
+import GoogleLogin from "@/components/Auth/GoogleLogin";
+import CustomInput from "@/components/CustomInput";
+import { getApiUrl } from "@/config/api.config";
+import { images } from "@/constants";
+import { useAuth } from "@/context/UserContext";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
   Alert,
@@ -9,19 +17,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useRouter } from "expo-router";
-import { useAuth } from "@/context/UserContext";
-import GoogleLogin from "@/components/Auth/GoogleLogin";
-import FacebookLogin from "@/components/Auth/FacebookLogin";
-import { images } from "@/constants";
 import { Chase } from "react-native-animated-spinkit";
-import { Ionicons } from "@expo/vector-icons";
-import CustomInput from "@/components/CustomInput";
 
 // For simplicity, you can replace CustomInput with a basic <TextInput> if you wish
 const OTP_BOXES = 6;
 
 const SignUp = () => {
+  console.log("SignUp Component Rendered");
   const { setToken, updateProfile, isDarkMode } = useAuth();
   const router = useRouter();
 
@@ -38,6 +40,27 @@ const SignUp = () => {
   const [passwordError, setPasswordError] = useState("");
   const [confirmError, setConfirmError] = useState("");
   const [loading, setLoading] = useState(false);
+  console.log("Current loading state:", loading);
+
+  // Password validation state
+  const [passwordValidation, setPasswordValidation] = useState({
+    minLength: false,
+    hasUppercase: false,
+    hasLowercase: false,
+    hasNumber: false,
+    hasSpecialChar: false,
+  });
+
+  // Validate password requirements
+  const validatePassword = (pwd: string) => {
+    setPasswordValidation({
+      minLength: pwd.length >= 8,
+      hasUppercase: /[A-Z]/.test(pwd),
+      hasLowercase: /[a-z]/.test(pwd),
+      hasNumber: /[0-9]/.test(pwd),
+      hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(pwd),
+    });
+  };
 
   const [modalVisible, setModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
@@ -68,8 +91,30 @@ const SignUp = () => {
 
   const emailRegex = /\S+@\S+\.\S+/;
 
+  // Handle password input with validation
+  const handlePasswordChange = (text: string) => {
+    setPassword(text);
+    validatePassword(text);
+
+    // Clear password error if all validations pass
+    const validations = {
+      minLength: text.length >= 8,
+      hasUppercase: /[A-Z]/.test(text),
+      hasLowercase: /[a-z]/.test(text),
+      hasNumber: /[0-9]/.test(text),
+      hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(text),
+    };
+
+    if (validations.minLength && validations.hasUppercase &&
+      validations.hasLowercase && validations.hasNumber &&
+      validations.hasSpecialChar) {
+      setPasswordError("");
+    }
+  };
+
   // Main signup logic
   const handleSignUpClick = async () => {
+    console.log("handleSignUpClick initiated");
     let valid = true;
 
     setEmailError("");
@@ -90,6 +135,18 @@ const SignUp = () => {
     } else if (password.length < 8) {
       setPasswordError("Password must be at least 8 characters");
       valid = false;
+    } else if (!passwordValidation.hasUppercase) {
+      setPasswordError("Password must contain at least one uppercase letter");
+      valid = false;
+    } else if (!passwordValidation.hasLowercase) {
+      setPasswordError("Password must contain at least one lowercase letter");
+      valid = false;
+    } else if (!passwordValidation.hasNumber) {
+      setPasswordError("Password must contain at least one number");
+      valid = false;
+    } else if (!passwordValidation.hasSpecialChar) {
+      setPasswordError("Password must contain at least one special character");
+      valid = false;
     }
 
     if (showConfirmPassword) {
@@ -102,7 +159,11 @@ const SignUp = () => {
       }
     }
 
+    console.log("All validations passed:", valid);
+    console.log("showConfirmPassword:", showConfirmPassword);
+
     if (!showConfirmPassword && valid) {
+      console.log("Showing confirm password field");
       setShowConfirmPassword(true);
       return;
     }
@@ -110,20 +171,28 @@ const SignUp = () => {
     if (showConfirmPassword && valid) {
       try {
         setLoading(true);
+        console.log("Attempting to send OTP...");
+        const url = getApiUrl("/otp/send-otp");
+        console.log("Fetching URL:", url);
+
         handleModal(
           "Loading...",
           "Please wait while we send the OTP to your email."
         );
         // Send OTP
         const otpRes = await fetch(
-          "https://feminiq-backend.onrender.com/otp/send-otp",
+          url,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email }),
           }
         );
+        console.log("Fetch response status:", otpRes.status);
         const otpJson = await otpRes.json();
+
+        console.log("OTP Response Data:", otpJson);
+
         setLoading(false);
         setModalVisible(false); // Hide modal
 
@@ -131,14 +200,21 @@ const SignUp = () => {
           setOtp("");
           setShowOtpModal(true);
         } else {
-          Alert.alert("OTP send failed", otpJson.error || "Please try again");
+          console.error("OTP send failed:", otpJson.error || otpJson.message);
+          Alert.alert("OTP send failed", otpJson.error || otpJson.message || "Please try again");
         }
-      } catch {
+      } catch (error: any) {
+        console.error("OTP Network Error:", error);
+        console.error("Error details:", {
+          message: error.message,
+          stack: error.stack,
+          name: error.name
+        });
         setLoading(false);
         setModalVisible(false); // Hide modal
         Alert.alert(
           "OTP network error",
-          "Failed to send OTP, please try again"
+          `Failed to send OTP: ${error.message || "Please check your network connection"}`
         );
       }
     }
@@ -175,7 +251,7 @@ const SignUp = () => {
     handleModal("Verifying OTP", "Please wait while we verify your code.");
     try {
       const res = await fetch(
-        "https://feminiq-backend.onrender.com/otp/verify-otp",
+        getApiUrl("/otp/verify-otp"),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -191,7 +267,7 @@ const SignUp = () => {
         setLoading(true);
         handleModal("Registering", "Creating your account...");
         const regRes = await fetch(
-          "https://feminiq-backend.onrender.com/register",
+          getApiUrl("/register"),
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -307,7 +383,7 @@ const SignUp = () => {
         <CustomInput
           placeholder="Password"
           value={password}
-          onChangeText={setPassword}
+          onChangeText={handlePasswordChange}
           leftIconName="lock-closed"
           rightIconName={secureTextEntry ? "eye-off-outline" : "eye-outline"}
           secureTextEntry={secureTextEntry}
@@ -317,18 +393,130 @@ const SignUp = () => {
           placeholderTextColor={placeholderColor}
           isEditing={true}
         />
-        {passwordError ? (
-          <Text
+
+        {/* Password Validation Indicators */}
+        {password.length > 0 && (
+          <View
             style={{
-              color: errorTextColor,
-              fontSize: 12,
-              fontFamily: "Poppins_400Regular",
-              marginTop: 4,
+              marginTop: 8,
+              padding: 12,
+              backgroundColor: isDarkMode ? "#1a1a1a" : "#f3f4f6",
+              borderRadius: 10,
+              gap: 8,
             }}
           >
-            {passwordError}
-          </Text>
-        ) : null}
+            <Text
+              style={{
+                fontFamily: "Poppins_500Medium",
+                fontSize: 13,
+                color: isDarkMode ? "#bbb" : "#666",
+                marginBottom: 4,
+              }}
+            >
+              Password must contain:
+            </Text>
+
+            {/* Minimum Length */}
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+              <Ionicons
+                name={passwordValidation.minLength ? "checkmark-circle" : "close-circle"}
+                size={18}
+                color={passwordValidation.minLength ? "#10b981" : "#9ca3af"}
+              />
+              <Text
+                style={{
+                  fontFamily: "Poppins_400Regular",
+                  fontSize: 12,
+                  color: passwordValidation.minLength
+                    ? "#10b981"
+                    : isDarkMode ? "#999" : "#6b7280",
+                }}
+              >
+                At least 8 characters
+              </Text>
+            </View>
+
+            {/* Uppercase */}
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+              <Ionicons
+                name={passwordValidation.hasUppercase ? "checkmark-circle" : "close-circle"}
+                size={18}
+                color={passwordValidation.hasUppercase ? "#10b981" : "#9ca3af"}
+              />
+              <Text
+                style={{
+                  fontFamily: "Poppins_400Regular",
+                  fontSize: 12,
+                  color: passwordValidation.hasUppercase
+                    ? "#10b981"
+                    : isDarkMode ? "#999" : "#6b7280",
+                }}
+              >
+                One uppercase letter (A-Z)
+              </Text>
+            </View>
+
+            {/* Lowercase */}
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+              <Ionicons
+                name={passwordValidation.hasLowercase ? "checkmark-circle" : "close-circle"}
+                size={18}
+                color={passwordValidation.hasLowercase ? "#10b981" : "#9ca3af"}
+              />
+              <Text
+                style={{
+                  fontFamily: "Poppins_400Regular",
+                  fontSize: 12,
+                  color: passwordValidation.hasLowercase
+                    ? "#10b981"
+                    : isDarkMode ? "#999" : "#6b7280",
+                }}
+              >
+                One lowercase letter (a-z)
+              </Text>
+            </View>
+
+            {/* Number */}
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+              <Ionicons
+                name={passwordValidation.hasNumber ? "checkmark-circle" : "close-circle"}
+                size={18}
+                color={passwordValidation.hasNumber ? "#10b981" : "#9ca3af"}
+              />
+              <Text
+                style={{
+                  fontFamily: "Poppins_400Regular",
+                  fontSize: 12,
+                  color: passwordValidation.hasNumber
+                    ? "#10b981"
+                    : isDarkMode ? "#999" : "#6b7280",
+                }}
+              >
+                One number (0-9)
+              </Text>
+            </View>
+
+            {/* Special Character */}
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+              <Ionicons
+                name={passwordValidation.hasSpecialChar ? "checkmark-circle" : "close-circle"}
+                size={18}
+                color={passwordValidation.hasSpecialChar ? "#10b981" : "#9ca3af"}
+              />
+              <Text
+                style={{
+                  fontFamily: "Poppins_400Regular",
+                  fontSize: 12,
+                  color: passwordValidation.hasSpecialChar
+                    ? "#10b981"
+                    : isDarkMode ? "#999" : "#6b7280",
+                }}
+              >
+                One special character (!@#$%^&*)
+              </Text>
+            </View>
+          </View>
+        )}
 
         {showConfirmPassword && (
           <>
@@ -400,15 +588,19 @@ const SignUp = () => {
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={handleSignUpClick}
+        onPress={() => {
+          console.log("SignUp Button Pressed - calling handleSignUpClick");
+          handleSignUpClick();
+        }}
         disabled={loading}
         style={{
-          backgroundColor: "#FF5ACC",
+          backgroundColor: loading ? "#ccc" : "#FF5ACC", // Visual feedback for disabled state
           borderRadius: 9999,
           paddingVertical: 16,
           marginTop: 20,
           justifyContent: "center",
           alignItems: "center",
+          opacity: loading ? 0.7 : 1,
         }}
       >
         <Text
@@ -418,7 +610,7 @@ const SignUp = () => {
             fontSize: 16,
           }}
         >
-          {showConfirmPassword ? "Submit" : "Sign up"}
+          {loading ? "Please wait..." : (showConfirmPassword ? "Submit" : "Sign up")}
         </Text>
       </TouchableOpacity>
 

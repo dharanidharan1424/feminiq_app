@@ -440,9 +440,9 @@ export default function NearbyStaffMap() {
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(toRad(lat1)) *
-        Math.cos(toRad(lat2)) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c; // in km
   };
@@ -575,6 +575,24 @@ export default function NearbyStaffMap() {
 
   useEffect(() => {
     const backAction = () => {
+      if (showDirectionsModal) {
+        setShowDirectionsModal(false);
+        return true;
+      }
+      if (showRoute) {
+        setShowRoute(false);
+        setRouteStaff(null);
+        setFilteredStaffs(previousFilteredStaffs.current);
+        setSelectedStaff(null);
+        setDistanceText("");
+        setDurationText("");
+        setParsedStaff(null);
+        return true;
+      }
+      if (radiusModal) {
+        setRadiusModal(false);
+        return true;
+      }
       if (router.canGoBack()) {
         router.back();
       } else {
@@ -890,14 +908,23 @@ export default function NearbyStaffMap() {
         >
           <View
             style={{
-              width: 40,
-              height: 6,
-              backgroundColor: "#ccc",
-              borderRadius: 3,
-              alignSelf: "center",
-              marginVertical: 10,
+              width: '100%',
+              height: 30, // Increased height for easier dragging
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "transparent",
             }}
-          />
+            {...panResponder.panHandlers}
+          >
+            <View
+              style={{
+                width: 40,
+                height: 6,
+                backgroundColor: "#ccc",
+                borderRadius: 3,
+              }}
+            />
+          </View>
           {!parsedStaff && !selectedStaff && (
             <View
               style={styles.headingContainer}
@@ -962,116 +989,120 @@ export default function NearbyStaffMap() {
                 statusBarTranslucent
                 onRequestClose={() => setRadiusModal(false)}
               >
-                <View
-                  style={{
-                    flex: 1,
-                    backgroundColor: "rgba(0,0,0,0.55)",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
+                <TouchableWithoutFeedback onPress={() => setRadiusModal(false)}>
                   <View
                     style={{
-                      backgroundColor: "#fff",
-                      width: "85%",
-                      borderRadius: 20,
-                      padding: 20,
+                      flex: 1,
+                      backgroundColor: "rgba(0,0,0,0.55)",
+                      justifyContent: "center",
+                      alignItems: "center",
                     }}
                   >
-                    <Text
-                      style={{
-                        fontSize: 18,
-                        fontFamily: "Poppins_600SemiBold",
-                        color: "#222",
-                        textAlign: "center",
-                        marginBottom: 20,
-                      }}
-                      className="border-b border-gray-300 pb-2 mb-4"
-                    >
-                      Select Distance Radius
-                    </Text>
-
-                    {/* 2x2 Grid of Radius Buttons */}
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        flexWrap: "wrap",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      {radiusOptions.map((option) => {
-                        const isSelected = selectedRadius === option.value;
-                        return (
-                          <TouchableOpacity
-                            key={option.value}
-                            style={{
-                              width: "47%",
-                              backgroundColor: isSelected ? "#FF5ACC" : "#fff",
-                              borderColor: "#FF5ACC",
-                              borderWidth: 2,
-                              borderRadius: 12,
-                              alignItems: "center",
-                              justifyContent: "center",
-                              paddingVertical: 20,
-                              marginBottom: 12,
-                            }}
-                            activeOpacity={0.8}
-                            onPress={() => setSelectedRadius(option.value)}
-                          >
-                            {isSelected && (
-                              <MaterialIcons
-                                name="check-circle"
-                                size={22}
-                                color="#fff"
-                                style={{
-                                  position: "absolute",
-                                  top: 8,
-                                  right: 8,
-                                }}
-                              />
-                            )}
-                            <MaterialIcons
-                              name="location-on"
-                              size={28}
-                              color={isSelected ? "#fff" : "#FF5ACC"}
-                            />
-                            <Text
-                              style={{
-                                color: isSelected ? "#fff" : "#FF5ACC",
-                                fontFamily: "Poppins_500Medium",
-                                marginTop: 6,
-                                fontSize: 14,
-                              }}
-                            >
-                              {option.label}
-                            </Text>
-                          </TouchableOpacity>
-                        );
-                      })}
-                    </View>
-
-                    <TouchableOpacity
-                      onPress={() => setRadiusModal(false)}
-                      style={{
-                        backgroundColor: "#FF5ACC",
-                        paddingVertical: 12,
-                        borderRadius: 10,
-                        marginTop: 10,
-                      }}
-                    >
-                      <Text
+                    <TouchableWithoutFeedback>
+                      <View
                         style={{
-                          textAlign: "center",
-                          color: "#fff",
-                          fontFamily: "Poppins_600SemiBold",
-                          fontSize: 16,
+                          backgroundColor: "#fff",
+                          width: "85%",
+                          borderRadius: 20,
+                          padding: 20,
                         }}
                       >
-                        Done
-                      </Text>
-                    </TouchableOpacity>
+                        <Text
+                          style={{
+                            fontSize: 18,
+                            fontFamily: "Poppins_600SemiBold",
+                            color: "#222",
+                            textAlign: "center",
+                            marginBottom: 20,
+                          }}
+                          className="border-b border-gray-300 pb-2 mb-4"
+                        >
+                          Select Distance Radius
+                        </Text>
+
+                        {/* 2x2 Grid of Radius Buttons */}
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            flexWrap: "wrap",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          {radiusOptions.map((option) => {
+                            const isSelected = selectedRadius === option.value;
+                            return (
+                              <TouchableOpacity
+                                key={option.value}
+                                style={{
+                                  width: "47%",
+                                  backgroundColor: isSelected ? "#FF5ACC" : "#fff",
+                                  borderColor: "#FF5ACC",
+                                  borderWidth: 2,
+                                  borderRadius: 12,
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  paddingVertical: 20,
+                                  marginBottom: 12,
+                                }}
+                                activeOpacity={0.8}
+                                onPress={() => setSelectedRadius(option.value)}
+                              >
+                                {isSelected && (
+                                  <MaterialIcons
+                                    name="check-circle"
+                                    size={22}
+                                    color="#fff"
+                                    style={{
+                                      position: "absolute",
+                                      top: 8,
+                                      right: 8,
+                                    }}
+                                  />
+                                )}
+                                <MaterialIcons
+                                  name="location-on"
+                                  size={28}
+                                  color={isSelected ? "#fff" : "#FF5ACC"}
+                                />
+                                <Text
+                                  style={{
+                                    color: isSelected ? "#fff" : "#FF5ACC",
+                                    fontFamily: "Poppins_500Medium",
+                                    marginTop: 6,
+                                    fontSize: 14,
+                                  }}
+                                >
+                                  {option.label}
+                                </Text>
+                              </TouchableOpacity>
+                            );
+                          })}
+                        </View>
+
+                        <TouchableOpacity
+                          onPress={() => setRadiusModal(false)}
+                          style={{
+                            backgroundColor: "#FF5ACC",
+                            paddingVertical: 12,
+                            borderRadius: 10,
+                            marginTop: 10,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              textAlign: "center",
+                              color: "#fff",
+                              fontFamily: "Poppins_600SemiBold",
+                              fontSize: 16,
+                            }}
+                          >
+                            Done
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    </TouchableWithoutFeedback>
                   </View>
-                </View>
+                </TouchableWithoutFeedback>
               </Modal>
             </View>
           )}
@@ -1126,9 +1157,8 @@ export default function NearbyStaffMap() {
           )}
           {routeStaff && (
             <View
-              className={`px-5 pb-10 mt-4 rounded-t-3xl shadow-lg shadow-primary/30/50 items-center space-y-4 ${
-                isDarkMode ? "bg-[#1e1e1e]" : "bg-white"
-              }`}
+              className={`px-5 pb-10 mt-4 rounded-t-3xl shadow-lg shadow-primary/30/50 items-center space-y-4 ${isDarkMode ? "bg-[#1e1e1e]" : "bg-white"
+                }`}
             >
               <View className="flex flex-row items-center w-full space-x-4">
                 <Image
@@ -1137,16 +1167,14 @@ export default function NearbyStaffMap() {
                 />
                 <View className="flex-1 ml-2">
                   <Text
-                    className={`text-lg font-semibold font-poppins-semibold ${
-                      isDarkMode ? "text-white" : "text-gray-900"
-                    }`}
+                    className={`text-lg font-semibold font-poppins-semibold ${isDarkMode ? "text-white" : "text-gray-900"
+                      }`}
                   >
                     {routeStaff.name}
                   </Text>
                   <Text
-                    className={`text-sm font-poppins-regular ${
-                      isDarkMode ? "text-gray-400" : "text-gray-500"
-                    }`}
+                    className={`text-sm font-poppins-regular ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
                   >
                     {routeStaff.address}
                   </Text>
@@ -1180,11 +1208,10 @@ export default function NearbyStaffMap() {
                 {(["DRIVING", "WALKING"] as const).map((mode) => (
                   <TouchableOpacity
                     key={mode}
-                    className={`flex-row items-center gap-2 px-4 py-1 rounded-full border ${
-                      travelMode === mode
+                    className={`flex-row items-center gap-2 px-4 py-1 rounded-full border ${travelMode === mode
                         ? "bg-primary border-primary"
                         : "border-primary bg-primary/20"
-                    }`}
+                      }`}
                     onPress={() => setTravelMode(mode)}
                   >
                     {mode === "DRIVING" ? (
@@ -1201,9 +1228,8 @@ export default function NearbyStaffMap() {
                       />
                     )}
                     <Text
-                      className={`text-xs font-poppins-semibold ${
-                        travelMode === mode ? "text-white" : "text-primary"
-                      }`}
+                      className={`text-xs font-poppins-semibold ${travelMode === mode ? "text-white" : "text-primary"
+                        }`}
                     >
                       {mode}
                     </Text>
@@ -1398,74 +1424,79 @@ export default function NearbyStaffMap() {
           transparent
           statusBarTranslucent
           animationType="slide"
+          onRequestClose={() => setShowDirectionsModal(false)}
         >
-          <View style={styles.modalContainer}>
-            <View
-              style={[
-                styles.modalContent,
-                isDarkMode
-                  ? { backgroundColor: "#1e1e1e" }
-                  : { backgroundColor: "#fff" },
-              ]}
-            >
-              <View
-                style={{
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginBottom: 12,
-                }}
-              >
-                <Image
-                  source={{ uri: selectedStaff?.mobile_image_url }}
-                  style={{ width: 100, height: 100, borderRadius: 50 }}
-                />
-                <Text
-                  className="font-poppins-semibold my-1"
-                  style={isDarkMode ? { color: "#fff" } : { color: "#000" }}
+          <TouchableWithoutFeedback onPress={() => setShowDirectionsModal(false)}>
+            <View style={styles.modalContainer}>
+              <TouchableWithoutFeedback>
+                <View
+                  style={[
+                    styles.modalContent,
+                    isDarkMode
+                      ? { backgroundColor: "#1e1e1e" }
+                      : { backgroundColor: "#fff" },
+                  ]}
                 >
-                  {selectedStaff?.name}
-                </Text>
-                <Text
-                  className="font-poppins-regular text-primary"
-                  style={
-                    isDarkMode ? { color: "#FF5ACC" } : { color: "#FF5ACC" }
-                  }
-                >
-                  {selectedStaff?.address}
-                </Text>
-              </View>
-              <View className="flex-row justify-between gap-4 px-2">
-                <TouchableOpacity
-                  className="bg-primary rounded-full px-5 py-1"
-                  onPress={() => handleViewDetails(selectedStaff)}
-                >
-                  <Text className="font-poppins-semibold text-white">
-                    View Details
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  className="bg-primary/20 border border-primary rounded-full px-5 py-1"
-                  onPress={() => {
-                    previousFilteredStaffs.current = filteredStaffs;
-                    setShowRoute(true);
-                    setShowDirectionsModal(false);
-                    if (selectedStaff) setRouteStaff(selectedStaff);
-                    setFilteredStaffs(selectedStaff ? [selectedStaff] : []);
-                  }}
-                >
-                  <Text
-                    className="font-poppins-semibold"
-                    style={
-                      isDarkMode ? { color: "#FF5ACC" } : { color: "#FF5ACC" }
-                    }
+                  <View
+                    style={{
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      marginBottom: 12,
+                    }}
                   >
-                    View Direction
-                  </Text>
-                </TouchableOpacity>
-              </View>
+                    <Image
+                      source={{ uri: selectedStaff?.mobile_image_url }}
+                      style={{ width: 100, height: 100, borderRadius: 50 }}
+                    />
+                    <Text
+                      className="font-poppins-semibold my-1"
+                      style={isDarkMode ? { color: "#fff" } : { color: "#000" }}
+                    >
+                      {selectedStaff?.name}
+                    </Text>
+                    <Text
+                      className="font-poppins-regular text-primary"
+                      style={
+                        isDarkMode ? { color: "#FF5ACC" } : { color: "#FF5ACC" }
+                      }
+                    >
+                      {selectedStaff?.address}
+                    </Text>
+                  </View>
+                  <View className="flex-row justify-between gap-4 px-2">
+                    <TouchableOpacity
+                      className="bg-primary rounded-full px-5 py-1"
+                      onPress={() => handleViewDetails(selectedStaff)}
+                    >
+                      <Text className="font-poppins-semibold text-white">
+                        View Details
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      className="bg-primary/20 border border-primary rounded-full px-5 py-1"
+                      onPress={() => {
+                        previousFilteredStaffs.current = filteredStaffs;
+                        setShowRoute(true);
+                        setShowDirectionsModal(false);
+                        if (selectedStaff) setRouteStaff(selectedStaff);
+                        setFilteredStaffs(selectedStaff ? [selectedStaff] : []);
+                      }}
+                    >
+                      <Text
+                        className="font-poppins-semibold"
+                        style={
+                          isDarkMode ? { color: "#FF5ACC" } : { color: "#FF5ACC" }
+                        }
+                      >
+                        View Direction
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
             </View>
-          </View>
+          </TouchableWithoutFeedback>
         </Modal>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>

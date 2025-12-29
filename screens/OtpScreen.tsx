@@ -1,6 +1,6 @@
-import React, { useRef, useState } from "react";
-import { Text, TextInput, TouchableOpacity, View, Modal } from "react-native";
 import { useRouter } from "expo-router";
+import React, { useRef, useState } from "react";
+import { Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { Chase } from "react-native-animated-spinkit"; // adjust import if needed
 
 const OTP_BOXES = 6;

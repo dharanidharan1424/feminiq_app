@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { TouchableOpacity, Text, Image, Modal, View } from "react-native";
-import {
-  GoogleSignin,
-  isSuccessResponse,
-} from "@react-native-google-signin/google-signin";
+import { Image, Modal, Text, TouchableOpacity, View } from "react-native";
+// import {
+//   GoogleSignin,
+//   isSuccessResponse,
+// } from "@react-native-google-signin/google-signin";
 import { Chase } from "react-native-animated-spinkit";
 
 type Props = {
@@ -14,9 +14,9 @@ type Props = {
   size?: string;
 };
 
-GoogleSignin.configure({
-  webClientId: "",
-});
+// GoogleSignin.configure({
+//   webClientId: "",
+// });
 
 const GoogleLogin: React.FC<Props> = ({
   onLoginSuccess,
@@ -47,6 +47,12 @@ const GoogleLogin: React.FC<Props> = ({
   };
 
   const handleGoogleSignIn = async () => {
+    handleModal(
+      "error",
+      "Google Sign-In Disabled",
+      "Google Sign-In is temporarily disabled for development in Expo Go."
+    );
+    /*
     handleModal("loading", "Signing in with Google...", "Please wait");
     try {
       await GoogleSignin.hasPlayServices();
@@ -88,6 +94,7 @@ const GoogleLogin: React.FC<Props> = ({
       handleModal("error", "Error", error.message || "Google login failed");
       onLoginFailure(error.message || "Google login failed");
     }
+    */
   };
 
   return (

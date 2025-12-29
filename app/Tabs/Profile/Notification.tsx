@@ -21,20 +21,23 @@ type ToggleKeys =
   | "payments"
   | "cashback"
   | "updates"
-  | "newService"
-  | "tips";
+  | "newService";
 
-const notificationItems: { key: ToggleKeys; label: string }[] = [
-  { key: "general", label: "General Notification" },
-  { key: "sound", label: "Sound" },
-  { key: "vibrate", label: "Vibrate" },
-  { key: "special", label: "Special Offers" },
-  { key: "promo", label: "Promo & Discount" },
-  { key: "payments", label: "Payments" },
-  { key: "cashback", label: "Cashback" },
-  { key: "updates", label: "App Updates" },
-  { key: "newService", label: "New Service Available" },
-];
+const notificationItems: {
+  key: ToggleKeys;
+  label: string;
+  icon: keyof typeof Ionicons.glyphMap;
+}[] = [
+    { key: "general", label: "General Notification", icon: "notifications-outline" },
+    { key: "sound", label: "Sound", icon: "volume-high-outline" },
+    { key: "vibrate", label: "Vibrate", icon: "notifications-outline" },
+    { key: "special", label: "Special Offers", icon: "gift-outline" },
+    { key: "promo", label: "Promo & Discount", icon: "pricetag-outline" },
+    { key: "payments", label: "Payments", icon: "card-outline" },
+    { key: "cashback", label: "Cashback", icon: "wallet-outline" },
+    { key: "updates", label: "App Updates", icon: "cloud-download-outline" },
+    { key: "newService", label: "New Service Available", icon: "add-circle-outline" },
+  ];
 
 const initialToggleState: Record<ToggleKeys, boolean> = {
   general: true,
@@ -46,7 +49,6 @@ const initialToggleState: Record<ToggleKeys, boolean> = {
   cashback: false,
   updates: true,
   newService: false,
-  tips: false,
 };
 
 const Notification: React.FC = () => {
@@ -65,45 +67,57 @@ const Notification: React.FC = () => {
   const textColor = isDarkMode ? "#eee" : "#222";
 
   return (
-    <ScrollView
-      style={{ flex: 1, backgroundColor }}
-      contentContainerStyle={{ padding: 20 }}
-    >
-      <View
-        style={{ flexDirection: "row", alignItems: "center", marginBottom: 20 }}
+    <View style={{ flex: 1, backgroundColor }}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ padding: 20 }}
       >
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons
-            name="arrow-back"
-            size={22}
-            color={textColor}
-            style={{ marginRight: 10 }}
-          />
-        </TouchableOpacity>
-        <Text
-          style={{
-            fontSize: 22,
-            fontFamily: "Poppins_600SemiBold",
-            color: textColor,
-          }}
+        <View
+          style={{ flexDirection: "row", alignItems: "center", marginBottom: 24 }}
         >
-          Notification
-        </Text>
-      </View>
-
-      {notificationItems.map((item) => (
-        <View key={item.key} style={styles.row}>
-          <Text style={[styles.label, { color: textColor }]}>{item.label}</Text>
-          <Switch
-            value={toggles[item.key]}
-            onValueChange={() => handleToggle(item.key)}
-            trackColor={{ false: "#eee", true: "#ff5acc" }}
-            thumbColor={toggles[item.key] ? "#fff" : "#ccc"}
-            ios_backgroundColor="#eee"
-          />
+          <TouchableOpacity onPress={() => router.back()}>
+            <Ionicons
+              name="arrow-back"
+              size={22}
+              color={textColor}
+              style={{ marginRight: 10 }}
+            />
+          </TouchableOpacity>
+          <Text
+            style={{
+              fontSize: 22,
+              fontFamily: "Poppins_600SemiBold",
+              color: textColor,
+            }}
+          >
+            Notification
+          </Text>
         </View>
-      ))}
-    </ScrollView>
+
+        <View style={{ gap: 4 }}>
+          {notificationItems.map((item) => (
+            <View key={item.key} style={styles.row}>
+              <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
+                <Ionicons
+                  name={item.icon}
+                  size={20}
+                  color={isDarkMode ? "#FF85C3" : "#FF5ACC"}
+                  style={{ marginRight: 12 }}
+                />
+                <Text style={[styles.label, { color: textColor }]}>{item.label}</Text>
+              </View>
+              <Switch
+                value={toggles[item.key]}
+                onValueChange={() => handleToggle(item.key)}
+                trackColor={{ false: "#ddd", true: "#ff5acc" }}
+                thumbColor={toggles[item.key] ? "#fff" : "#ccc"}
+                ios_backgroundColor="#eee"
+              />
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
