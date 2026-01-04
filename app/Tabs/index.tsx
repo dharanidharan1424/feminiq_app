@@ -4,7 +4,6 @@ import HeroCarousel from "@/components/Home/Herocarousel";
 import NearbyLocation from "@/components/Home/NearbyLocation";
 import Popular from "@/components/Home/Popular";
 import ServicesSlider from "@/components/Home/ServicesSlider";
-import { getApiUrl } from "@/config/api.config";
 import { images } from "@/constants";
 import { useAuth } from "@/context/UserContext";
 import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
@@ -31,7 +30,7 @@ import {
 import { Pulse } from "react-native-animated-spinkit";
 import Modal from "react-native-modal";
 
-const STAFFS_API = getApiUrl("/api/get-staffs");
+const STAFFS_API = ("https://femiiniq-backend.onrender.com/api/get-staffs");
 
 const SERVICES = [
   { title: "All", categoryId: null },
@@ -353,7 +352,7 @@ const Index = () => {
             // Ensure you have user profile and token
             try {
               const response = await fetch(
-                getApiUrl("/login/savePushToken"),
+                "https://femiiniq-backend.onrender.com/api/login/savePushToken",
                 {
                   method: "POST",
                   headers: {

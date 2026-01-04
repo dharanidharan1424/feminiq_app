@@ -1,28 +1,28 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  Alert,
-  Modal,
-  TextInput,
-  ScrollView,
-} from "react-native";
 import {
   FontAwesome,
   Ionicons,
   MaterialCommunityIcons,
   MaterialIcons,
 } from "@expo/vector-icons";
-import { useAuth } from "../../context/UserContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Pulse } from "react-native-animated-spinkit";
 import { router, useLocalSearchParams } from "expo-router";
+import React, { useEffect, useState } from "react";
+import {
+  Alert,
+  FlatList,
+  Image,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { Pulse } from "react-native-animated-spinkit";
+import { useAuth } from "../../context/UserContext";
 
 interface Review {
   id: number;
@@ -100,7 +100,7 @@ const ReviewDetials: React.FC<ReviewsProps> = () => {
       setLoading(true);
       try {
         const res = await fetch(
-          `https://feminiq-backend.onrender.com/reviews/staff/${entityId}`
+          `https://femiiniq-backend.onrender.com/reviews/staff/${entityId}`
         );
         if (!res.ok) throw new Error("Failed to fetch reviews");
         const json = await res.json();
@@ -158,7 +158,7 @@ const ReviewDetials: React.FC<ReviewsProps> = () => {
         rating: selectedRating,
         comment: newReviewText.trim(),
       };
-      const res = await fetch("https://feminiq-backend.onrender.com/reviews", {
+      const res = await fetch("https://femiiniq-backend.onrender.com/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(reviewPayload),
@@ -219,7 +219,7 @@ const ReviewDetials: React.FC<ReviewsProps> = () => {
     }
 
     try {
-      const url = `https://feminiq-backend.onrender.com/reviews/${id}/${liked ? "unlike" : "like"}`;
+      const url = `https://femiiniq-backend.onrender.com/reviews/${id}/${liked ? "unlike" : "like"}`;
       await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -253,7 +253,7 @@ const ReviewDetials: React.FC<ReviewsProps> = () => {
         comment: newReviewText.trim(),
       };
       const res = await fetch(
-        `https://feminiq-backend.onrender.com/reviews/${editReviewId}`,
+        `https://femiiniq-backend.onrender.com/reviews/${editReviewId}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -303,7 +303,7 @@ const ReviewDetials: React.FC<ReviewsProps> = () => {
   const deleteReview = async (reviewId: number) => {
     try {
       const res = await fetch(
-        `https://feminiq-backend.onrender.com/reviews/${reviewId}`,
+        `https://femiiniq-backend.onrender.com/reviews/${reviewId}`,
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
@@ -419,9 +419,8 @@ const ReviewDetials: React.FC<ReviewsProps> = () => {
 
         <View className="flex-col px-2">
           <View
-            className={`flex-row justify-between items-center border-b pb-3 ${
-              isDarkMode ? "border-zinc-800" : "border-gray-200"
-            }`}
+            className={`flex-row justify-between items-center border-b pb-3 ${isDarkMode ? "border-zinc-800" : "border-gray-200"
+              }`}
           >
             <View className="flex-row items-center gap-1">
               <MaterialIcons name="star-half" size={25} color={"#FF5ACC"} />
@@ -433,8 +432,8 @@ const ReviewDetials: React.FC<ReviewsProps> = () => {
               >
                 {reviews.length > 0
                   ? (
-                      reviews.reduce((a, r) => a + r.rating, 0) / reviews.length
-                    ).toFixed(1)
+                    reviews.reduce((a, r) => a + r.rating, 0) / reviews.length
+                  ).toFixed(1)
                   : "0.0"}{" "}
                 ({reviews.length} reviews)
               </Text>

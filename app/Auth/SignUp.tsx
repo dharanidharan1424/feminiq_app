@@ -116,7 +116,7 @@ const SignUp = () => {
         );
         // Send OTP
         const otpRes = await fetch(
-          "http://192.168.1.6:3000/otp/send-otp",
+          "https://femiiniq-backend.onrender.com/otp/send-otp",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -175,7 +175,7 @@ const SignUp = () => {
     handleModal("Verifying OTP", "Please wait while we verify your code.");
     try {
       const res = await fetch(
-        "http://192.168.1.6:3000/otp/verify-otp",
+        "https://femiiniq-backend.onrender.com/otp/verify-otp",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -191,7 +191,7 @@ const SignUp = () => {
         setLoading(true);
         handleModal("Registering", "Creating your account...");
         const regRes = await fetch(
-          "http://192.168.1.6:3000/register",
+          "https://femiiniq-backend.onrender.com/register",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -496,7 +496,7 @@ const SignUp = () => {
             fontSize: 14,
           }}
         >
-          Already have an account?
+          Already have an accounts
         </Text>
         <TouchableOpacity onPress={() => router.push("/Auth/Login")}>
           <Text

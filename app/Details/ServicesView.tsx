@@ -1,16 +1,16 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  FlatList,
-  Image,
-} from "react-native";
-import React, { useEffect, useState } from "react";
+import { useAuth } from "@/context/UserContext";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import React, { useEffect, useState } from "react";
+import {
+  FlatList,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Pulse } from "react-native-animated-spinkit";
-import { useAuth } from "@/context/UserContext";
 
 interface ServiceCategory {
   id: number;
@@ -33,7 +33,7 @@ const ServicesView = () => {
   };
 
   useEffect(() => {
-    fetch("https://feminiq-backend.onrender.com/api/service-categories")
+    fetch("https://femiiniq-backend.onrender.com/api/service-categories")
       .then((res) => res.json())
       .then((json) => {
         setServices(json.categories || []);

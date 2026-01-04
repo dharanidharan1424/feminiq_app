@@ -1,21 +1,21 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState, useMemo } from "react";
+import { useAuth } from "@/context/UserContext";
+import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useMemo, useState } from "react";
 import {
-  View,
+  BackHandler,
+  Image,
+  ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  Image,
-  StyleSheet,
-  ScrollView,
-  BackHandler,
+  View,
 } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
 import { Calendar } from "react-native-calendars";
-import { Ionicons } from "@expo/vector-icons";
 import Modal from "react-native-modal";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useAuth } from "@/context/UserContext";
 
 import { Wave } from "react-native-animated-spinkit";
 
@@ -68,7 +68,7 @@ export default function BookingPage() {
       setLoading(true);
       try {
         const response = await fetch(
-          "https://feminiq-backend.onrender.com/api/get-staffs"
+          "https://femiiniq-backend.onrender.com/api/get-staffs"
         );
         const json = await response.json();
         if (json.status === "success" && Array.isArray(json.data)) {
@@ -118,7 +118,7 @@ export default function BookingPage() {
         if (!token) return;
         const location = await AsyncStorage.getItem(`location_${token}`);
         if (location) setStoredLocation(location);
-      } catch {}
+      } catch { }
     }
     loadStoredLocation();
   }, [token]);
@@ -414,9 +414,8 @@ export default function BookingPage() {
           Service At *
         </Text>
         <TouchableOpacity
-          className={`flex-row justify-between items-center rounded-lg px-4 py-2 border ${
-            isDarkMode ? "border-primary" : "border-primary"
-          }`}
+          className={`flex-row justify-between items-center rounded-lg px-4 py-2 border ${isDarkMode ? "border-primary" : "border-primary"
+            }`}
           style={{
             backgroundColor: isDarkMode
               ? "rgba(255, 90, 204, 0.1)"
@@ -525,13 +524,12 @@ export default function BookingPage() {
           </Text>
           <View className="flex-row justify-around mb-4">
             <TouchableOpacity
-              className={`flex-1 py-3 mx-1 rounded-xl border ${
-                locationSelection === "customer_location"
+              className={`flex-1 py-3 mx-1 rounded-xl border ${locationSelection === "customer_location"
                   ? "border-primary"
                   : isDarkMode
                     ? "border-gray-600"
                     : "border-gray-300"
-              }`}
+                }`}
               style={{
                 backgroundColor:
                   locationSelection === "customer_location"
@@ -558,13 +556,12 @@ export default function BookingPage() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              className={`flex-1 py-3 mx-1 rounded-xl border ${
-                locationSelection === "provider_location"
+              className={`flex-1 py-3 mx-1 rounded-xl border ${locationSelection === "provider_location"
                   ? "border-primary"
                   : isDarkMode
                     ? "border-gray-600"
                     : "border-gray-300"
-              }`}
+                }`}
               style={{
                 backgroundColor:
                   locationSelection === "provider_location"
@@ -601,13 +598,12 @@ export default function BookingPage() {
               </Text>
 
               <TouchableOpacity
-                className={`p-3 rounded-xl border mb-2 ${
-                  customerLocationSelection === "current_location"
+                className={`p-3 rounded-xl border mb-2 ${customerLocationSelection === "current_location"
                     ? "border-primary"
                     : isDarkMode
                       ? "border-gray-600"
                       : "border-gray-300"
-                }`}
+                  }`}
                 style={{
                   backgroundColor:
                     customerLocationSelection === "current_location"
@@ -642,13 +638,12 @@ export default function BookingPage() {
               </TouchableOpacity>
 
               <TouchableOpacity
-                className={`p-3 rounded-xl border mb-2 ${
-                  customerLocationSelection === "profile_address"
+                className={`p-3 rounded-xl border mb-2 ${customerLocationSelection === "profile_address"
                     ? "border-primary"
                     : isDarkMode
                       ? "border-gray-600"
                       : "border-gray-300"
-                }`}
+                  }`}
                 style={{
                   backgroundColor:
                     customerLocationSelection === "profile_address"
@@ -682,13 +677,12 @@ export default function BookingPage() {
                 )}
               </TouchableOpacity>
               <TouchableOpacity
-                className={`p-3 rounded-xl border ${
-                  customerLocationSelection === "alternative_address"
+                className={`p-3 rounded-xl border ${customerLocationSelection === "alternative_address"
                     ? "border-primary"
                     : isDarkMode
                       ? "border-gray-600"
                       : "border-gray-300"
-                }`}
+                  }`}
                 style={{
                   backgroundColor:
                     customerLocationSelection === "alternative_address"

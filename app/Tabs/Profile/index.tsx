@@ -1,4 +1,3 @@
-import { getApiUrl } from "@/config/api.config";
 import { useAuth } from "@/context/UserContext";
 import {
   Feather,
@@ -241,9 +240,10 @@ const ProfileScreen: React.FC = () => {
       */
 
       // Backend logout call
-      await fetch(getApiUrl("/logout"), {
+      await fetch("https://femiiniq-backend.onrender.com/api/logout"),
+      {
         method: "POST",
-      });
+      };
 
       logout(); // Your app logout function
 
@@ -268,7 +268,7 @@ const ProfileScreen: React.FC = () => {
   ): Promise<string | null> => {
     try {
       const response = await fetch(
-        getApiUrl("/delete-profile"),
+        "https://femiiniq-backend.onrender.com/api/delete-profile",
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },

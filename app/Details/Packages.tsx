@@ -1,10 +1,10 @@
-import { View, Text, FlatList, StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
+import { FlatList, StyleSheet, Text, View } from "react-native";
 import { Wave } from "react-native-animated-spinkit";
 
+import PackageCard from "@/components/PackageCard";
 import { useAuth } from "@/context/UserContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import PackageCard from "@/components/PackageCard";
 
 interface PackageType {
   id: number;
@@ -59,7 +59,7 @@ const Packages: React.FC<PackageProps> = ({ data }) => {
     const fetchPackages = async () => {
       try {
         const response = await fetch(
-          `https://feminiq-backend.onrender.com/api/get-package/${data.service_id}`
+          `https://femiiniq-backend.onrender.com/api/get-package/${data.service_id}`
         );
         const json = await response.json();
         if (response.ok) {
@@ -117,9 +117,8 @@ const Packages: React.FC<PackageProps> = ({ data }) => {
     >
       <View
         style={{ marginBottom: 10 }}
-        className={`flex-row justify-between items-center border-b pb-3 ${
-          isDarkMode ? "border-gray-700" : "border-gray-200"
-        }`}
+        className={`flex-row justify-between items-center border-b pb-3 ${isDarkMode ? "border-gray-700" : "border-gray-200"
+          }`}
       >
         <Text
           style={{

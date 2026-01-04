@@ -1,28 +1,6 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
-import {
-  StyleSheet,
-  View,
-  Text,
-  TextInput,
-  FlatList,
-  Dimensions,
-  Alert,
-  KeyboardAvoidingView,
-  Image,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  Keyboard,
-  Modal,
-  Animated,
-  Linking,
-  BackHandler,
-  PanResponder,
-} from "react-native";
-import MapView, { Marker, PROVIDER_GOOGLE, Circle } from "react-native-maps";
-import * as Location from "expo-location";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import ProfileCard from "@/components/CustomCard";
-import { Chase } from "react-native-animated-spinkit";
+import locations from "@/constants/locations.json";
+import { useAuth } from "@/context/UserContext";
 import {
   Entypo,
   Feather,
@@ -30,10 +8,32 @@ import {
   Ionicons,
   MaterialIcons,
 } from "@expo/vector-icons";
-import locations from "@/constants/locations.json";
-import { useAuth } from "@/context/UserContext";
-import MapViewDirections from "react-native-maps-directions";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Location from "expo-location";
 import { router, useLocalSearchParams } from "expo-router";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+  Alert,
+  Animated,
+  BackHandler,
+  Dimensions,
+  FlatList,
+  Image,
+  Keyboard,
+  KeyboardAvoidingView,
+  Linking,
+  Modal,
+  PanResponder,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
+import { Chase } from "react-native-animated-spinkit";
+import MapView, { Circle, Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import MapViewDirections from "react-native-maps-directions";
 
 const LOCATION_STORAGE_KEY = "user_location";
 const SCREEN_HEIGHT = Dimensions.get("window").height;
@@ -254,9 +254,10 @@ export default function NearbyStaffMap() {
     setIsLoading(true);
     try {
       const response = await fetch(
-        "https://feminiq-backend.onrender.com/api/get-staffs"
+        "https://femiiniq-backend.onrender.com/api/get-staffs"
       );
       const json = await response.json();
+      console.log("RAW API RESPONSE:", json);
       if (json.status === "success" && Array.isArray(json.data)) {
         const validStaffs = json.data.filter(
           (s: Staff) =>
@@ -267,6 +268,7 @@ export default function NearbyStaffMap() {
             s.latitude !== undefined &&
             s.longitude !== undefined
         );
+        console.log("VALID STAFF COUNT:", validStaffs.length);
         setStaffs(validStaffs);
         setFilteredStaffs(validStaffs);
       }
@@ -500,7 +502,7 @@ export default function NearbyStaffMap() {
         return dist <= 10;
       });
     } else {
-      return null;
+      return;
     }
     const selectedService = services.find(
       (svc) => svc.title === selectedServiceButton
@@ -1209,8 +1211,8 @@ export default function NearbyStaffMap() {
                   <TouchableOpacity
                     key={mode}
                     className={`flex-row items-center gap-2 px-4 py-1 rounded-full border ${travelMode === mode
-                        ? "bg-primary border-primary"
-                        : "border-primary bg-primary/20"
+                      ? "bg-primary border-primary"
+                      : "border-primary bg-primary/20"
                       }`}
                     onPress={() => setTravelMode(mode)}
                   >

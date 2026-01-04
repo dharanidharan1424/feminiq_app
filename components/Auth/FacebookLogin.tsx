@@ -75,7 +75,7 @@ const FacebookLogin: React.FC<Props> = ({
 
       // 🔹 backend OAuth login
       const backendRes = await fetch(
-        "https://feminiq-backend.onrender.com/login/oauth-login",
+        "https://femiiniq-backend.onrender.com/login/oauth-login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

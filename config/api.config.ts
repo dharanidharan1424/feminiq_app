@@ -26,7 +26,7 @@ const getLocalIp = () => {
 
 export const BASE_URL =
     process.env.NODE_ENV === "production"
-        ? "https://feminiq-backend.onrender.com"
+        ? "https://femiiniq-backend.onrender.com"
         : `http://${getLocalIp()}:3000`;
 
 /**

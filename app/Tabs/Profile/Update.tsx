@@ -152,7 +152,7 @@ const Update: React.FC = () => {
       showModal("Updating Profile", "", true);
       setIsLoading(true);
       const response = await fetch(
-        "http://192.168.1.6:3000/update-profile/",
+        "https://femiiniq-backend.onrender.com/api/update-profile/",
         {
           method: "POST",
           credentials: "include",

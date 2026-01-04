@@ -1,20 +1,20 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useAuth } from "@/context/UserContext";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
-  Text,
+  Animated,
+  Dimensions,
   FlatList,
   Image,
-  Dimensions,
-  TouchableOpacity,
-  StatusBar,
   Modal,
-  Animated,
   PanResponder,
-  StyleSheet,
   Pressable,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { Wave } from "react-native-animated-spinkit";
-import { useAuth } from "@/context/UserContext";
 
 const { width, height } = Dimensions.get("window");
 const numColumns = 3;
@@ -33,7 +33,7 @@ const Gallery = ({ data }: { data: any }) => {
     const fetchStaffs = async () => {
       try {
         const response = await fetch(
-          "https://feminiq-backend.onrender.com/api/get-staffs"
+          "https://femiiniq-backend.onrender.com/api/get-staffs"
         );
         const json = await response.json();
         if (response.ok) {

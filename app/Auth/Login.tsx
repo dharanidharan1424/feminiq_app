@@ -1,5 +1,4 @@
 import CustomInput from "@/components/CustomInput";
-import { getApiUrl } from "@/config/api.config";
 import { images } from "@/constants";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -51,7 +50,7 @@ const Login = () => {
     handleModal("Loading...", "Please wait while we log you in.");
     try {
       const response = await fetch(
-        getApiUrl("/login"),
+        "https://femiiniq-backend.onrender.com/login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

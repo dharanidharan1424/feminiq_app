@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from "react";
-import {
-  FlatList,
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  ScrollView,
-  Pressable,
-} from "react-native";
-import Modal from "react-native-modal";
 import ProfileCard from "@/components/CustomCard";
 import { useAuth } from "@/context/UserContext";
 import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { Wave } from "react-native-animated-spinkit";
 import { router } from "expo-router";
+import React, { useEffect, useState } from "react";
+import {
+  FlatList,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { Wave } from "react-native-animated-spinkit";
+import Modal from "react-native-modal";
 
-const STAFFS_API = "https://feminiq-backend.onrender.com/api/get-staffs";
+const STAFFS_API = "https://femiiniq-backend.onrender.com/api/get-staffs";
 
 const PROFESSIONAL_TYPES = ["All", "Solo", "Studio"];
 const RATINGS = ["All", "5", "4", "3", "2"];
@@ -338,19 +338,17 @@ const Popular: React.FC = () => {
             {["Provider Location", "Your Location"].map((opt) => (
               <TouchableOpacity
                 key={opt}
-                className={`flex-1 mx-1 py-2 rounded-full border items-center ${
-                  selectedServiceAt === opt
+                className={`flex-1 mx-1 py-2 rounded-full border items-center ${selectedServiceAt === opt
                     ? "bg-[#FF5ACC] border-[#FF5ACC]"
                     : "bg-transparent border-[#FF5ACC]"
-                }`}
+                  }`}
                 onPress={() => setSelectedServiceAt(opt)}
               >
                 <Text
-                  className={`${
-                    selectedServiceAt === opt
+                  className={`${selectedServiceAt === opt
                       ? "text-white "
                       : "text-[#FF5ACC] "
-                  }font-poppins-regular`}
+                    }font-poppins-regular`}
                 >
                   {opt}
                 </Text>

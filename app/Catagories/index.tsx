@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from "react";
-import {
-  FlatList,
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Pressable,
-  ScrollView,
-} from "react-native";
-import Modal from "react-native-modal";
 import ProfileCard from "@/components/CustomCard";
 import { useAuth } from "@/context/UserContext";
 import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { Wave } from "react-native-animated-spinkit";
 import { useGlobalSearchParams } from "expo-router";
+import React, { useEffect, useState } from "react";
+import {
+  FlatList,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { Wave } from "react-native-animated-spinkit";
+import Modal from "react-native-modal";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 interface Staff {
@@ -33,7 +33,7 @@ interface Staff {
   mobile_image_url: string;
 }
 
-const STAFFS_API = "https://feminiq-backend.onrender.com/api/get-staffs";
+const STAFFS_API = "https://femiiniq-backend.onrender.com/api/get-staffs";
 
 const PRIMARY_LIGHT = "#FF5ACC";
 

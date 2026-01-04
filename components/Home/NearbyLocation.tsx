@@ -88,7 +88,7 @@ const NearbyLocation: React.FC = () => {
       setLoading(true);
       try {
         const response = await fetch(
-          "https://feminiq-backend.onrender.com/api/get-staffs"
+          "https://femiiniq-backend.onrender.com/api/get-staffs"
         );
         const json = await response.json();
         if (json.status === "success" && Array.isArray(json.data)) {

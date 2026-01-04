@@ -1,18 +1,18 @@
-import React, { useState, useEffect, useMemo } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-  Image,
-  BackHandler,
-  Modal,
-} from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
 import { useAuth } from "@/context/UserContext";
+import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  BackHandler,
+  Image,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Flow, Wave } from "react-native-animated-spinkit";
 
 interface ServiceTypeData {
@@ -121,7 +121,7 @@ const Index: React.FC = () => {
       setLoading(true);
       try {
         const response = await fetch(
-          "https://feminiq-backend.onrender.com/api/get-staffs"
+          "https://femiiniq-backend.onrender.com/api/get-staffs"
         );
         const json = await response.json();
         if (json.status === "success" && Array.isArray(json.data)) {

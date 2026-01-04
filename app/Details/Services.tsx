@@ -1,8 +1,8 @@
 import { useAuth } from "@/context/UserContext";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import React, { useEffect, useState } from "react";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { Pulse } from "react-native-animated-spinkit";
 
 interface ServiceCategory {
@@ -24,7 +24,7 @@ const Services: React.FC = () => {
   };
 
   useEffect(() => {
-    fetch("https://feminiq-backend.onrender.com/api/service-categories")
+    fetch("https://femiiniq-backend.onrender.com/api/service-categories")
       .then((res) => res.json())
       .then((json) => {
         setServices(json.categories || []);
@@ -48,9 +48,8 @@ const Services: React.FC = () => {
     <ScrollView contentContainerStyle={{ paddingBottom: 16 }}>
       <View
         style={{ marginBottom: 20 }}
-        className={`flex-row justify-between items-center border-b pb-3 ${
-          isDarkMode ? "border-gray-700" : "border-gray-200"
-        }`}
+        className={`flex-row justify-between items-center border-b pb-3 ${isDarkMode ? "border-gray-700" : "border-gray-200"
+          }`}
       >
         <Text
           style={{
@@ -63,9 +62,8 @@ const Services: React.FC = () => {
         </Text>
         <TouchableOpacity onPress={() => router.push("/Details/ServicesView")}>
           <Text
-            className={`text-md font-poppins-medium ${
-              isDarkMode ? "text-pink-400" : "text-primary"
-            }`}
+            className={`text-md font-poppins-medium ${isDarkMode ? "text-pink-400" : "text-primary"
+              }`}
           >
             See All
           </Text>
@@ -84,9 +82,8 @@ const Services: React.FC = () => {
       {services.map((service) => (
         <TouchableOpacity
           key={service.id}
-          className={`border-[1px] ${
-            isDarkMode ? "border-gray-700" : "border-gray-100"
-          }`}
+          className={`border-[1px] ${isDarkMode ? "border-gray-700" : "border-gray-100"
+            }`}
           style={{
             backgroundColor: isDarkMode ? "#1E1E1E" : "#fff",
             paddingVertical: 18,
@@ -113,9 +110,8 @@ const Services: React.FC = () => {
           </Text>
           <View className="flex-row">
             <Text
-              className={`font-poppins-regular ${
-                isDarkMode ? "text-pink-400" : "text-primary"
-              }`}
+              className={`font-poppins-regular ${isDarkMode ? "text-pink-400" : "text-primary"
+                }`}
               style={{ fontSize: 15 }}
             >
               {service.typeCount ? `${service.typeCount} types` : "4 Types"}

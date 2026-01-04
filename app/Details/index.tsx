@@ -1,34 +1,34 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import React, { useEffect, useRef, useState } from "react";
-import {
-  View,
-  Text,
-  ImageBackground,
-  Platform,
-  StatusBar,
-  TouchableOpacity,
-  Image,
-  ScrollView,
-  Linking,
-  Share,
-  Pressable,
-  Modal,
-  BackHandler,
-} from "react-native";
-import { router, useLocalSearchParams } from "expo-router";
+import { useAuth } from "@/context/UserContext"; // ✅ import your context
 import {
   Entypo,
   FontAwesome5,
   Ionicons,
   MaterialIcons,
 } from "@expo/vector-icons";
-import About from "./About";
-import Services from "./Services";
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  BackHandler,
+  Image,
+  ImageBackground,
+  Linking,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  Share,
+  StatusBar,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Pulse } from "react-native-animated-spinkit";
-import Packages from "./Packages";
+import About from "./About";
 import Gallery from "./Gallery";
+import Packages from "./Packages";
 import Reviews from "./Reviews";
-import { useAuth } from "@/context/UserContext"; // ✅ import your context
+import Services from "./Services";
 
 const index = () => {
   const staffData = useLocalSearchParams();
@@ -303,9 +303,8 @@ const index = () => {
             <View className="flex-row justify-between">
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <Text
-                  className={`font-poppins-semibold text-xl ${
-                    isDarkMode ? "text-white" : "text-black"
-                  }`}
+                  className={`font-poppins-semibold text-xl ${isDarkMode ? "text-white" : "text-black"
+                    }`}
                 >
                   {staffData.name}
                 </Text>
@@ -320,11 +319,10 @@ const index = () => {
               </View>
 
               <TouchableOpacity
-                className={`px-6 py-2 rounded-full flex-row items-center border justify-center ${
-                  showTick
-                    ? "border-green-600 bg-green-100"
-                    : "border-red-600 bg-red-200"
-                }`}
+                className={`px-6 py-2 rounded-full flex-row items-center border justify-center ${showTick
+                  ? "border-green-600 bg-green-100"
+                  : "border-red-600 bg-red-200"
+                  }`}
               >
                 <Ionicons
                   name={showTick ? "checkmark-circle" : "close-circle"}
@@ -333,9 +331,8 @@ const index = () => {
                   style={{ marginRight: 6 }}
                 />
                 <Text
-                  className={`font-poppins-semibold text-center mt-1 ${
-                    showTick ? "text-green-500" : "text-red-500"
-                  }`}
+                  className={`font-poppins-semibold text-center mt-1 ${showTick ? "text-green-500" : "text-red-500"
+                    }`}
                 >
                   {showTick ? "Open" : "Close"}
                 </Text>
@@ -398,9 +395,8 @@ const index = () => {
             >
               <MaterialIcons name="star-half" size={20} color={"#FF5ACC"} />
               <Text
-                className={`font-poppins-regular text-sm ${
-                  isDarkMode ? "text-gray-300" : "text-gray-500"
-                }`}
+                className={`font-poppins-regular text-sm ${isDarkMode ? "text-gray-300" : "text-gray-500"
+                  }`}
               >
                 {staffData.rating}({staffData.reviews} reviews)
               </Text>
@@ -408,9 +404,8 @@ const index = () => {
             <View className="flex-row items-center w-auto shrink-0 mt-1 md:mt-0">
               <Entypo name="suitcase" size={20} color={"#FF5ACC"} />
               <Text
-                className={` ml-1 font-poppins-regular text-sm ${
-                  isDarkMode ? "text-gray-300" : "text-gray-500"
-                }`}
+                className={` ml-1 font-poppins-regular text-sm ${isDarkMode ? "text-gray-300" : "text-gray-500"
+                  }`}
               >
                 Experience : 4.2 Years
               </Text>
@@ -457,9 +452,8 @@ const index = () => {
                 <Ionicons name={icon} size={20} color="#FF5ACC" />
               </View>
               <Text
-                className={`text-[12px] font-poppins-medium ${
-                  isDarkMode ? "text-white" : "text-black"
-                }`}
+                className={`text-[12px] font-poppins-medium ${isDarkMode ? "text-white" : "text-black"
+                  }`}
               >
                 {label}
               </Text>
@@ -471,9 +465,8 @@ const index = () => {
         <View>
           <View className="flex-row justify-between">
             <Text
-              className={`font-poppins-semibold text-xl ${
-                isDarkMode ? "text-white" : "text-black"
-              }`}
+              className={`font-poppins-semibold text-xl ${isDarkMode ? "text-white" : "text-black"
+                }`}
             >
               Our Specialist
             </Text>
@@ -494,9 +487,8 @@ const index = () => {
           </View>
           <View className="flex-row items-center">
             <View
-              className={`mt-5 p-2 rounded-2xl items-center ${
-                isDarkMode ? "border border-gray-700" : "border border-gray-200"
-              }`}
+              className={`mt-5 p-2 rounded-2xl items-center ${isDarkMode ? "border border-gray-700" : "border border-gray-200"
+                }`}
             >
               <Image
                 source={{ uri: String(staffData.mobile_image_url) }}
@@ -504,16 +496,14 @@ const index = () => {
                 resizeMode="cover"
               />
               <Text
-                className={`text-xs font-poppins-medium mb-0.5 ${
-                  isDarkMode ? "text-white" : "text-black"
-                }`}
+                className={`text-xs font-poppins-medium mb-0.5 ${isDarkMode ? "text-white" : "text-black"
+                  }`}
               >
                 {staffData.name}
               </Text>
               <Text
-                className={`text-xs font-poppins-regular ${
-                  isDarkMode ? "text-gray-400" : "text-gray-500"
-                }`}
+                className={`text-xs font-poppins-regular ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                  }`}
               >
                 {getServiceName(staffData.service_id)}
               </Text>
@@ -531,19 +521,17 @@ const index = () => {
             {Tabs.map((value, i) => (
               <View key={i}>
                 <TouchableOpacity
-                  className={`px-4 py-1 rounded-full border ${
-                    selectedTab === value.id ? "bg-primary" : "bg-transparent"
-                  } ${isDarkMode ? "border-gray-600" : "border-primary"}`}
+                  className={`px-4 py-1 rounded-full border ${selectedTab === value.id ? "bg-primary" : "bg-transparent"
+                    } ${isDarkMode ? "border-gray-600" : "border-primary"}`}
                   onPress={() => handleTabPress(value.id)}
                 >
                   <Text
-                    className={`font-poppins-medium ${
-                      selectedTab === value.id
-                        ? "text-white"
-                        : isDarkMode
-                          ? "text-gray-200"
-                          : "text-primary"
-                    }`}
+                    className={`font-poppins-medium ${selectedTab === value.id
+                      ? "text-white"
+                      : isDarkMode
+                        ? "text-gray-200"
+                        : "text-primary"
+                      }`}
                   >
                     {value.title}
                   </Text>

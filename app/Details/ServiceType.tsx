@@ -1,18 +1,18 @@
+import ServiceCard from "@/components/ServiceCard";
+import { useAuth } from "@/context/UserContext";
+import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
   BackHandler,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { router, useLocalSearchParams } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Wave } from "react-native-animated-spinkit";
-import { useAuth } from "@/context/UserContext";
-import ServiceCard from "@/components/ServiceCard";
 
 interface ServiceTypeData {
   id: number;
@@ -82,7 +82,7 @@ const ServiceType: React.FC = () => {
 
   useEffect(() => {
     if (serviceId) {
-      fetch(`https://feminiq-backend.onrender.com/api/get-types`)
+      fetch(`https://femiiniq-backend.onrender.com/api/get-types`)
         .then((res) => res.json())
         .then((json) => {
           const filteredServices =

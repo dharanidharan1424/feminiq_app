@@ -1,21 +1,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState, useMemo } from "react";
+import { useAuth } from "@/context/UserContext";
+import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useMemo, useState } from "react";
 import {
-  View,
+  BackHandler,
+  Image,
+  ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  ScrollView,
-  Image,
-  StyleSheet,
-  BackHandler,
+  View,
 } from "react-native";
-import { useRouter, useLocalSearchParams } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import Modal from "react-native-modal";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Calendar } from "react-native-calendars";
-import { useAuth } from "@/context/UserContext";
 import { Wave } from "react-native-animated-spinkit";
+import { Calendar } from "react-native-calendars";
+import Modal from "react-native-modal";
 
 type Staff = {
   id: number;
@@ -95,7 +95,7 @@ export default function BookingPage() {
       setLoading(true);
       try {
         const response = await fetch(
-          "https://feminiq-backend.onrender.com/api/get-staffs"
+          "https://femiiniq-backend.onrender.com/api/get-staffs"
         );
         const json = await response.json();
         if (json.status === "success" && Array.isArray(json.data)) {
@@ -119,7 +119,7 @@ export default function BookingPage() {
         if (!token) return;
         const location = await AsyncStorage.getItem(`location_${token}`);
         if (location) setStoredLocation(location);
-      } catch {}
+      } catch { }
     }
     loadStoredLocation();
   }, [token]);
@@ -409,17 +409,15 @@ export default function BookingPage() {
           Service At *
         </Text>
         <TouchableOpacity
-          className={`flex-row justify-between items-center border rounded-lg px-4 py-2 ${
-            isDarkMode
+          className={`flex-row justify-between items-center border rounded-lg px-4 py-2 ${isDarkMode
               ? "bg-gray-800 border-gray-600"
               : "bg-primary/10 border-primary"
-          }`}
+            }`}
           onPress={toggleModal}
         >
           <Text
-            className={`font-poppins-regular text-sm flex-1 font-normal ${
-              isDarkMode ? "text-white" : "text-primary"
-            }`}
+            className={`font-poppins-regular text-sm flex-1 font-normal ${isDarkMode ? "text-white" : "text-primary"
+              }`}
           >
             {serviceLocation || "Choose Location"}
           </Text>
@@ -495,32 +493,29 @@ export default function BookingPage() {
           className={`p-6 rounded-t-3xl ${isDarkMode ? "bg-gray-900" : "bg-white"}`}
         >
           <Text
-            className={`text-center text-xl font-poppins-regular mb-4 ${
-              isDarkMode ? "text-white" : "text-primary"
-            }`}
+            className={`text-center text-xl font-poppins-regular mb-4 ${isDarkMode ? "text-white" : "text-primary"
+              }`}
           >
             Select Service Location
           </Text>
           <View className="flex-row justify-around mb-4">
             {/* Customer Location */}
             <TouchableOpacity
-              className={`flex-1 py-3 mx-1 rounded-xl border ${
-                locationSelection === "customer_location"
+              className={`flex-1 py-3 mx-1 rounded-xl border ${locationSelection === "customer_location"
                   ? "bg-primary/10 border-primary"
                   : isDarkMode
                     ? "bg-gray-800 border-gray-600"
                     : "bg-gray-100 border-gray-300"
-              }`}
+                }`}
               onPress={() => selectLocation("customer_location")}
             >
               <Text
-                className={`text-center font-poppins-medium ${
-                  locationSelection === "customer_location"
+                className={`text-center font-poppins-medium ${locationSelection === "customer_location"
                     ? "text-primary"
                     : isDarkMode
                       ? "text-white"
                       : "text-gray-600"
-                }`}
+                  }`}
               >
                 Customer Location
               </Text>
@@ -528,23 +523,21 @@ export default function BookingPage() {
 
             {/* Provider Location */}
             <TouchableOpacity
-              className={`flex-1 py-3 mx-1 rounded-xl border ${
-                locationSelection === "provider_location"
+              className={`flex-1 py-3 mx-1 rounded-xl border ${locationSelection === "provider_location"
                   ? "bg-primary/10 border-primary"
                   : isDarkMode
                     ? "bg-gray-800 border-gray-600"
                     : "bg-gray-100 border-gray-300"
-              }`}
+                }`}
               onPress={() => selectLocation("provider_location")}
             >
               <Text
-                className={`text-center font-poppins-medium ${
-                  locationSelection === "provider_location"
+                className={`text-center font-poppins-medium ${locationSelection === "provider_location"
                     ? "text-primary"
                     : isDarkMode
                       ? "text-white"
                       : "text-gray-600"
-                }`}
+                  }`}
               >
                 Provider Location
               </Text>
@@ -555,40 +548,36 @@ export default function BookingPage() {
           {locationSelection === "customer_location" && (
             <View className="mt-4">
               <Text
-                className={`text-base font-poppins-semibold mb-2 ${
-                  isDarkMode ? "text-white" : "text-gray-800"
-                }`}
+                className={`text-base font-poppins-semibold mb-2 ${isDarkMode ? "text-white" : "text-gray-800"
+                  }`}
               >
                 Select Customer Location
               </Text>
 
               {/* Current Location */}
               <TouchableOpacity
-                className={`p-3 rounded-xl border mb-2 ${
-                  customerLocationSelection === "current_location"
+                className={`p-3 rounded-xl border mb-2 ${customerLocationSelection === "current_location"
                     ? "bg-primary/10 border-primary"
                     : isDarkMode
                       ? "bg-gray-800 border-gray-600"
                       : "bg-gray-100 border-gray-300"
-                }`}
+                  }`}
                 onPress={() => selectCustomerLocationOption("current_location")}
               >
                 <Text
-                  className={`font-poppins-medium ${
-                    customerLocationSelection === "current_location"
+                  className={`font-poppins-medium ${customerLocationSelection === "current_location"
                       ? "text-primary"
                       : isDarkMode
                         ? "text-white"
                         : "text-gray-600"
-                  }`}
+                    }`}
                 >
                   Current Location
                 </Text>
                 {customerLocationSelection === "current_location" && (
                   <Text
-                    className={`text-xs font-poppins-regular mt-1 ${
-                      isDarkMode ? "text-gray-400" : "text-gray-500"
-                    }`}
+                    className={`text-xs font-poppins-regular mt-1 ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
                   >
                     {storedLocation || "Fetching location..."}
                   </Text>
@@ -597,64 +586,58 @@ export default function BookingPage() {
 
               {/* Profile Address */}
               <TouchableOpacity
-                className={`p-3 rounded-xl border mb-2 ${
-                  customerLocationSelection === "profile_address"
+                className={`p-3 rounded-xl border mb-2 ${customerLocationSelection === "profile_address"
                     ? "bg-primary/10 border-primary"
                     : isDarkMode
                       ? "bg-gray-800 border-gray-600"
                       : "bg-gray-100 border-gray-300"
-                }`}
+                  }`}
                 onPress={() => selectCustomerLocationOption("profile_address")}
               >
                 <Text
-                  className={`font-poppins-medium ${
-                    customerLocationSelection === "profile_address"
+                  className={`font-poppins-medium ${customerLocationSelection === "profile_address"
                       ? "text-primary"
                       : isDarkMode
                         ? "text-white"
                         : "text-gray-600"
-                  }`}
+                    }`}
                 >
                   Profile Address
                 </Text>
                 {customerLocationSelection === "profile_address" && (
                   <Text
-                    className={`text-xs font-poppins-regular mt-1 ${
-                      isDarkMode ? "text-gray-400" : "text-gray-500"
-                    }`}
+                    className={`text-xs font-poppins-regular mt-1 ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
                   >
                     {profile?.address || "No address in profile"}
                   </Text>
                 )}
               </TouchableOpacity>
               <TouchableOpacity
-                className={`p-3 rounded-xl border ${
-                  customerLocationSelection === "alternative_address"
+                className={`p-3 rounded-xl border ${customerLocationSelection === "alternative_address"
                     ? "bg-primary/10 border-primary"
                     : isDarkMode
                       ? "bg-gray-800 border-gray-600"
                       : "bg-gray-100 border-gray-300"
-                }`}
+                  }`}
                 onPress={() =>
                   selectCustomerLocationOption("alternative_address")
                 }
               >
                 <Text
-                  className={`font-poppins-medium ${
-                    customerLocationSelection === "alternative_address"
+                  className={`font-poppins-medium ${customerLocationSelection === "alternative_address"
                       ? "text-primary"
                       : isDarkMode
                         ? "text-white"
                         : "text-gray-600"
-                  }`}
+                    }`}
                 >
                   Alternative Address
                 </Text>
                 {customerLocationSelection === "alternative_address" && (
                   <Text
-                    className={`text-xs font-poppins-regular mt-1 ${
-                      isDarkMode ? "text-gray-400" : "text-gray-500"
-                    }`}
+                    className={`text-xs font-poppins-regular mt-1 ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                      }`}
                   >
                     {profile?.altaddress || "No address in profile"}
                   </Text>
@@ -667,16 +650,14 @@ export default function BookingPage() {
           {locationSelection === "provider_location" && (
             <View className="mt-4">
               <Text
-                className={`text-base font-poppins-semibold mb-2 ${
-                  isDarkMode ? "text-white" : "text-gray-800"
-                }`}
+                className={`text-base font-poppins-semibold mb-2 ${isDarkMode ? "text-white" : "text-gray-800"
+                  }`}
               >
                 Provider Location
               </Text>
               <Text
-                className={`text-xs font-poppins-regular ${
-                  isDarkMode ? "text-gray-400" : "text-gray-500"
-                }`}
+                className={`text-xs font-poppins-regular ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                  }`}
               >
                 {providerAddress || "No provider address available"}
               </Text>
