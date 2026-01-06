@@ -204,12 +204,14 @@ const Index: React.FC = () => {
   };
 
   const handleNavigateToStaff = (staffId: number) => {
-    const staffData = getStaffById(staffId);
+    const staffData = staffs.find((s) => s.id === staffId);
     console.log("Navigating to staff:", staffData);
     if (staffData) {
       router.push({
         pathname: "/Details",
-        params: { ...staffData }, // Pass as string if needed
+        params: {
+          staffData: JSON.stringify(staffData),
+        },
       });
     } else {
       console.warn("Staff not found");

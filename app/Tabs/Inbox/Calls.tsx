@@ -86,7 +86,7 @@ const Calls = () => {
         >
           <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
             <Image
-              source={images.serv_3}
+              source={avatar ? { uri: avatar } : images.Female_img}
               style={{ width: 48, height: 48, borderRadius: 24 }}
               resizeMode="cover"
             />

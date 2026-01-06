@@ -1,8 +1,6 @@
-/* eslint-disable react-hooks/rules-of-hooks */
-import { Slot, useRouter } from "expo-router";
+import { Stack } from "expo-router";
 import React from "react";
 import { View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import "../globals.css";
 
 import { useAuth } from "@/context/UserContext";
@@ -13,11 +11,9 @@ import {
   Poppins_700Bold,
   useFonts,
 } from "@expo-google-fonts/poppins";
-import { Ionicons } from "@expo/vector-icons";
 import { Wave } from "react-native-animated-spinkit";
 
 const _layout = () => {
-  const router = useRouter();
   const { isDarkMode } = useAuth();
 
   const [fontsLoaded] = useFonts({
@@ -39,16 +35,19 @@ const _layout = () => {
   }
 
   return (
-    <>
-      <SafeAreaView
-        className="flex-1"
-        style={{ backgroundColor: isDarkMode ? "#222" : "" }}
-      >
-        <View className="flex-1">
-          <Slot />
-        </View>
-      </SafeAreaView>
-    </>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: {
+          backgroundColor: isDarkMode ? "#222" : "white"
+        },
+        animation: 'slide_from_right',
+      }}
+    >
+      <Stack.Screen name="index" />
+      <Stack.Screen name="ReviewDetials" />
+      <Stack.Screen name="Specialist" />
+    </Stack>
   );
 };
 

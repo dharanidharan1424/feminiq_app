@@ -1,10 +1,12 @@
+import DeleteAccountModal from "@/components/Profile/DeleteAccountModal";
 import { getApiUrl } from "@/config/api.config";
 import { useAuth } from "@/context/UserContext";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React, { useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import {
   Alert,
+  Image,
   ScrollView,
   StyleSheet,
   Switch,
@@ -13,11 +15,26 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
+import { Chase } from "react-native-animated-spinkit";
+import Modal from "react-native-modal";
 
 const OTP_BOXES = 6;
 
+// Deletion Reasons
+const deleteReasons = [
+  "No Longer Needed",
+  "Found a Better Alternative",
+  "The App contains too many Ads",
+  "Privacy Concerns",
+  "Not Enough Providers/Services",
+  "Poor User Experience",
+  "Lack of Features",
+  "Dissatisfied with Service Providers",
+  "Others",
+];
+
 const Security: React.FC = () => {
-  const { isDarkMode, profile } = useAuth();
+  const { isDarkMode, profile, logout } = useAuth();
   const userId = profile?.id as string | undefined;
 
   const [rememberMe, setRememberMe] = useState(true);
@@ -43,6 +60,24 @@ const Security: React.FC = () => {
   const [otpLoading, setOtpLoading] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const inputRefs = useRef<(TextInput | null)[]>([]);
+
+  // DELETE MODAL STATE
+  const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
+  const toggleDeleteModal = useCallback(() => {
+    setDeleteModalVisible((prev) => !prev);
+  }, []);
+
+  // LOGOUT MODAL STATE
+  const [isLogoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [logoutModalStage, setLogoutModalStage] = useState<
+    "confirm" | "loading" | "success"
+  >("confirm");
+
+  const toggleLogoutModal = useCallback(() => {
+    if (logoutModalStage === "loading") return;
+    setLogoutModalVisible((prev) => !prev);
+    if (!isLogoutModalVisible) setLogoutModalStage("confirm");
+  }, [isLogoutModalVisible, logoutModalStage]);
 
   const backgroundColor = isDarkMode ? "#222" : "#fff";
   const textColor = isDarkMode ? "#eee" : "#222";
@@ -188,6 +223,68 @@ const Security: React.FC = () => {
     }
   };
 
+  // LOGOUT HANDLER
+  const handleLogout = async () => {
+    setLogoutModalStage("loading");
+
+    try {
+      await fetch("https://femiiniq-backend.onrender.com/api/logout", {
+        method: "POST",
+      });
+
+      logout();
+
+      setLogoutModalStage("success");
+
+      setTimeout(() => {
+        setLogoutModalVisible(false);
+        setLogoutModalStage("confirm");
+        router.replace("/");
+      }, 2000);
+    } catch (error: any) {
+      console.error("Logout failed:", error);
+      Alert.alert("Error", "Logout failed. Try again.");
+      setLogoutModalStage("confirm");
+    }
+  };
+
+  // DELETE HANDLER
+  const handleDeleteAccount = async (
+    reasons: string[],
+    otherReason: string
+  ): Promise<string | null> => {
+    try {
+      const response = await fetch(
+        "https://femiiniq-backend.onrender.com/api/delete-profile",
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            fullname: profile?.fullname,
+            mobile: profile?.mobile,
+            address: profile?.address,
+            reason: reasons.join(", "),
+            extrareason: otherReason,
+            unique_id: profile?.unique_id,
+          }),
+        }
+      );
+
+      const json = await response.json();
+
+      if (json.status === "success") {
+        logout();
+        return null;
+      } else {
+        return json.message || "Failed to delete account.";
+      }
+    } catch (error: any) {
+      console.error("Delete account error:", error);
+      return "Network error, please try again.";
+    }
+  };
+
   return (
     <>
       <ScrollView
@@ -241,7 +338,111 @@ const Security: React.FC = () => {
           />
         </View>
 
+        {/* Logout and Delete Account Section */}
+        <View style={styles.footerRow}>
+          <TouchableOpacity
+            onPress={() => setLogoutModalVisible(true)}
+            style={{ flexDirection: "row", alignItems: "center", gap: 5 }}
+          >
+            <Ionicons name="log-out-outline" size={20} color="#FF000D" />
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={toggleDeleteModal}>
+            <Text style={styles.deleteText}>Delete Account</Text>
+          </TouchableOpacity>
+        </View>
+
       </ScrollView>
+
+      {/* DELETE MODAL */}
+      <DeleteAccountModal
+        isVisible={isDeleteModalVisible}
+        isDarkMode={isDarkMode}
+        toggleModal={toggleDeleteModal}
+        deleteReasons={deleteReasons}
+        handleDeleteAccount={handleDeleteAccount}
+      />
+
+      {/* LOGOUT MODAL */}
+      <Modal
+        isVisible={isLogoutModalVisible}
+        backdropOpacity={0.6}
+        animationIn="fadeIn"
+        animationOut="fadeOut"
+        style={{ justifyContent: "center", margin: 20 }}
+        statusBarTranslucent
+        onBackdropPress={toggleLogoutModal}
+      >
+        <View
+          style={[
+            styles.modalContent,
+            {
+              backgroundColor: isDarkMode ? "#333" : "#fff",
+              alignItems: "center",
+            },
+          ]}
+        >
+          {logoutModalStage === "confirm" && (
+            <>
+              <Image
+                source={{
+                  uri: "https://res.cloudinary.com/dv9s7sm0x/image/upload/v1757739949/8622276_3963536-removebg-preview_ipbf5j.png",
+                }}
+                style={styles.modalImage}
+                resizeMode="cover"
+              />
+              <Text style={styles.modalTitle}>Logout</Text>
+              <Text
+                style={[
+                  styles.modalMessage,
+                  { color: isDarkMode ? "#fff" : "#555" },
+                ]}
+              >
+                Are you sure you want to log out?
+              </Text>
+              <View style={styles.modalButtonRow}>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.cancelButton]}
+                  onPress={toggleLogoutModal}
+                >
+                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.logoutButton]}
+                  onPress={handleLogout}
+                >
+                  <Text style={styles.logoutButtonText}>Yes, Logout</Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
+
+          {logoutModalStage === "loading" && (
+            <>
+              <Chase size={50} color="#FF5ACC" />
+              <Text
+                style={[
+                  styles.modalMessage,
+                  { color: isDarkMode ? "#eee" : "#444", marginTop: 16 },
+                ]}
+              >
+                Logging out...
+              </Text>
+            </>
+          )}
+
+          {logoutModalStage === "success" && (
+            <Text
+              style={[
+                styles.modalMessage,
+                { color: isDarkMode ? "#eee" : "#222" },
+              ]}
+            >
+              You have been logged out.
+            </Text>
+          )}
+        </View>
+      </Modal>
     </>
   );
 };
@@ -340,6 +541,75 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins_600SemiBold",
     color: "#fff",
     fontSize: 17,
+  },
+  footerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 32,
+    marginTop: 30,
+    marginBottom: 20,
+  },
+  logoutText: {
+    color: "#FF000D",
+    fontFamily: "Poppins_400Regular",
+    fontSize: 16,
+  },
+  deleteText: {
+    color: "#FF000D",
+    fontFamily: "Poppins_400Regular",
+    fontSize: 16,
+    opacity: 0.82,
+  },
+  modalContent: {
+    backgroundColor: "white",
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    borderRadius: 20,
+  },
+  modalImage: {
+    width: 200,
+    height: 150,
+    marginBottom: 16,
+    borderRadius: 16,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontFamily: "Poppins_600SemiBold",
+    marginBottom: 12,
+    color: "#FF000D",
+  },
+  modalMessage: {
+    fontSize: 14,
+    fontFamily: "Poppins_400Regular",
+    color: "#444",
+    textAlign: "center",
+    marginBottom: 30,
+  },
+  modalButtonRow: {
+    flexDirection: "row",
+    width: "100%",
+    justifyContent: "space-between",
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 25,
+    alignItems: "center",
+    marginHorizontal: 5,
+  },
+  cancelButton: {
+    backgroundColor: "#f3d6e6",
+  },
+  cancelButtonText: {
+    color: "#FF5ACC",
+    fontFamily: "Poppins_600SemiBold",
+  },
+  logoutButton: {
+    backgroundColor: "#FF5ACC",
+  },
+  logoutButtonText: {
+    color: "white",
+    fontFamily: "Poppins_600SemiBold",
   },
 });
 

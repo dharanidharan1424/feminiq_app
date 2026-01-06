@@ -581,7 +581,7 @@ export default function BookingPage() {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), 10000); // 10 seconds timeout
 
-    fetch(`https://feminiq-backend.onrender.com/booking/user/${profile.id}`, {
+    fetch(`https://femiiniq-backend.onrender.com/booking/user/${profile.id}`, {
       signal: controller.signal,
     })
       .then((res) => res.json())
@@ -662,7 +662,7 @@ export default function BookingPage() {
   async function handleConfirmCancel() {
     if (!bookingToCancel?.booking_code) return;
 
-    await fetch("https://feminiq-backend.onrender.com/booking/cancel", {
+    await fetch("https://femiiniq-backend.onrender.com/booking/cancel", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -699,7 +699,7 @@ export default function BookingPage() {
     setRescheduleLoading(true); // start loading
     try {
       await fetch(
-        "https://feminiq-backend.onrender.com/booking/reschedule-request",
+        "https://femiiniq-backend.onrender.com/booking/reschedule-request",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -747,7 +747,7 @@ export default function BookingPage() {
     setCancelRescheduleLoading(true); // Start loading
     try {
       const res = await fetch(
-        `https://feminiq-backend.onrender.com/booking/reschedule-cancel/${pendingCancelRescheduleId}`,
+        `https://femiiniq-backend.onrender.com/booking/reschedule-cancel/${pendingCancelRescheduleId}`,
         { method: "POST" }
       );
       const data = await res.json();
@@ -945,7 +945,7 @@ export default function BookingPage() {
 
               try {
                 const response = await fetch(
-                  `https://feminiq-backend.onrender.com/notification/toggle-booking-reminder`,
+                  `https://femiiniq-backend.onrender.com/notification/toggle-booking-reminder`,
                   {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -983,7 +983,7 @@ export default function BookingPage() {
             const getStaffDetails = async () => {
               try {
                 const response = await fetch(
-                  `https://feminiq-backend.onrender.com/api/get-staffs/${staffId}`
+                  `https://femiiniq-backend.onrender.com/api/get-staffs/${staffId}`
                 );
 
                 const data = await response.json();

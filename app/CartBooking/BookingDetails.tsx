@@ -1,20 +1,20 @@
-import React, { useEffect, useMemo, useState } from "react";
-import {
-  View,
-  Text,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-  KeyboardAvoidingView,
-  Platform,
-  BackHandler,
-} from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router, useLocalSearchParams } from "expo-router";
+import { images } from "@/constants";
 import { useAuth } from "@/context/UserContext";
 import { Ionicons } from "@expo/vector-icons";
-import { images } from "@/constants";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  BackHandler,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 interface Service {
   booked?: number; // e.g. 350
@@ -257,9 +257,9 @@ export default function BookingDetails() {
   const getSpecialistNames = (specialists: Specialist[]) =>
     specialists.length > 0
       ? specialists
-          .map((s) => s.name)
-          .filter(Boolean)
-          .join(", ")
+        .map((s) => s.name)
+        .filter(Boolean)
+        .join(", ")
       : "N/A";
 
   const handleBackNavigation = () => {
@@ -412,7 +412,7 @@ export default function BookingDetails() {
                         ((parseFloat(item.original_price as string) -
                           parseFloat(item.price as string)) /
                           parseFloat(item.original_price as string)) *
-                          100
+                        100
                       )}
                       % OFF
                     </Text>
@@ -547,11 +547,10 @@ export default function BookingDetails() {
           {PAYMENT_METHODS.map((v, i) => (
             <View key={i}>
               <TouchableOpacity
-                className={`flex-row items-center border rounded-lg px-5 mb-2 ${
-                  selectedPaymentMethod === v.value
+                className={`flex-row items-center border rounded-lg px-5 mb-2 ${selectedPaymentMethod === v.value
                     ? "bg-pink-50 border-primary"
                     : "bg-white border-primary/50"
-                }`}
+                  }`}
                 onPress={() => setSelectedPaymentMethod(v.value)}
                 activeOpacity={0.85}
               >
@@ -561,11 +560,10 @@ export default function BookingDetails() {
                   resizeMode="contain"
                 />
                 <Text
-                  className={`text-lg ${
-                    selectedPaymentMethod === v.value
+                  className={`text-lg ${selectedPaymentMethod === v.value
                       ? "text-primary font-poppins-semibold"
                       : "text-primary/50 font-poppins-regular"
-                  }`}
+                    }`}
                 >
                   {v.label}
                 </Text>

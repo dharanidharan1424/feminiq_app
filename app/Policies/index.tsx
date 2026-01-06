@@ -1,15 +1,15 @@
 /* eslint-disable react-hooks/rules-of-hooks */
+import { useAuth } from "@/context/UserContext";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import React from "react";
 import {
-  View,
+  ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
-  StyleSheet,
-  ScrollView,
+  View,
 } from "react-native";
-import React from "react";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { useAuth } from "@/context/UserContext";
-import { router } from "expo-router";
 
 type ProfileMenuProps = {
   icon: React.ReactNode;
@@ -28,7 +28,13 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({
   onPress,
   isDarkMode,
 }) => (
-  <TouchableOpacity style={styles.menuRow} onPress={onPress}>
+  <TouchableOpacity
+    style={[
+      styles.menuRow,
+      { borderBottomColor: isDarkMode ? "#333" : "#f3f3f3" }
+    ]}
+    onPress={onPress}
+  >
     <View style={{ flexDirection: "row" }}>
       {icon}
       <Text style={[styles.menuText, { color: isDarkMode ? "#fff" : "#222" }]}>
@@ -55,21 +61,41 @@ const ProfileMenu: React.FC<ProfileMenuProps> = ({
 
 const index = () => {
   const { isDarkMode } = useAuth();
+  const backgroundColor = isDarkMode ? "#222" : "#fff";
+  const textColor = isDarkMode ? "#eee" : "#222";
+
   return (
-    <View className="flex-1 bg-white dark:bg-slate-900">
+    <View style={{ flex: 1, backgroundColor }}>
       <ScrollView>
-        <View className="flex-row items-center gap-4 py-4 px-3 border-b border-gray-200">
-          <Ionicons
-            name="arrow-back"
-            size={20}
-            color={"#000"}
-            onPress={() => router.push("/Tabs/Profile")}
-          />
-          <Text className="text-2xl font-poppins-semibold text-gray-800 dark:text-white">
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 16,
+            paddingVertical: 16,
+            paddingHorizontal: 12,
+            borderBottomWidth: 1,
+            borderBottomColor: isDarkMode ? "#333" : "#e5e7eb",
+          }}
+        >
+          <TouchableOpacity onPress={() => router.push("/Tabs/Profile")}>
+            <Ionicons
+              name="arrow-back"
+              size={22}
+              color={textColor}
+            />
+          </TouchableOpacity>
+          <Text
+            style={{
+              fontSize: 22,
+              fontFamily: "Poppins_600SemiBold",
+              color: textColor,
+            }}
+          >
             Policies
           </Text>
         </View>
-        <View className="mb-4 px-3">
+        <View style={{ marginBottom: 16, paddingHorizontal: 12, marginTop: 8 }}>
           <ProfileMenu
             icon={
               <MaterialIcons

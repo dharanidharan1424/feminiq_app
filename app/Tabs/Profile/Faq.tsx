@@ -105,7 +105,7 @@ const Faq = () => {
   return (
     <ScrollView contentContainerStyle={[styles.container, { backgroundColor }]}>
       <View style={styles.headerRow}>
-        <TouchableOpacity onPress={() => router.push("/Tabs/Profile")}>
+        <TouchableOpacity onPress={() => router.push("/Tabs")}>
           <Ionicons name="arrow-back" size={24} color={headerTextColor} />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: headerTextColor }]}>

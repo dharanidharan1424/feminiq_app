@@ -39,15 +39,15 @@ const LOCATION_STORAGE_KEY = "user_location";
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 
 interface Staff {
-  longitude: null | string | number;
-  latitude: null | string | number;
+  longitude: string | number;
+  latitude: string | number;
   id: number;
   name: string;
   address: string;
   distance: number;
   rating: number;
   service_id: string;
-  image: string;
+  image: string | any;
   mobile_image_url: string;
   type: string;
   average_rating?: string; // if any
@@ -117,7 +117,7 @@ export default function NearbyStaffMap() {
   const [openDropdown, setOpenDropdown] = useState<"sort" | null>(null);
 
   const [radiusModal, setRadiusModal] = useState(false);
-  const [selectedRadius, setSelectedRadius] = useState(1);
+  const [selectedRadius, setSelectedRadius] = useState(10);
 
   const radiusOptions = [
     { label: "1 km", value: 1 },
@@ -257,20 +257,24 @@ export default function NearbyStaffMap() {
         "https://femiiniq-backend.onrender.com/api/get-staffs"
       );
       const json = await response.json();
-      console.log("RAW API RESPONSE:", json);
+
+      // console.log("RAW API RESPONSE:", json);
+
       if (json.status === "success" && Array.isArray(json.data)) {
-        const validStaffs = json.data.filter(
-          (s: Staff) =>
-            s.latitude !== null &&
-            s.longitude !== null &&
-            s.latitude !== "null" &&
-            s.longitude !== "null" &&
-            s.latitude !== undefined &&
-            s.longitude !== undefined
-        );
-        console.log("VALID STAFF COUNT:", validStaffs.length);
-        setStaffs(validStaffs);
-        setFilteredStaffs(validStaffs);
+        const patchedStaffs = json.data.map((s: Staff) => ({
+          ...s,
+          latitude:
+            s.latitude !== null
+              ? Number(s.latitude)
+              : 9.9252, // Madurai latitude
+          longitude:
+            s.longitude !== null
+              ? Number(s.longitude)
+              : 78.1198, // Madurai longitude
+        }));
+
+        setStaffs(patchedStaffs);
+        setFilteredStaffs(patchedStaffs);
       }
     } catch (error) {
       console.error("Failed to fetch staffs", error);
@@ -278,6 +282,7 @@ export default function NearbyStaffMap() {
       setIsLoading(false);
     }
   }, []);
+
 
   useEffect(() => {
     fetchStaffs();
@@ -458,82 +463,85 @@ export default function NearbyStaffMap() {
       setFilteredStaffs([parsedStaff]);
       setSelectedStaff(parsedStaff);
       setShowRoute(true);
-      setRouteStaff(parsedStaff); // use parsed staff from params
-      return; // stop further filtering
-    }
-
-    if (!centerLocation) return;
-
-    let filtered: Staff[];
-
-    if (searchLocation) {
-      filtered = staffs.filter((s) => {
-        if (s.latitude == null || s.longitude == null) return false;
-        const latNum =
-          typeof s.latitude === "string" ? parseFloat(s.latitude) : s.latitude;
-        const lonNum =
-          typeof s.longitude === "string"
-            ? parseFloat(s.longitude)
-            : s.longitude;
-
-        const dist = calculateDistance(
-          centerLocation.latitude,
-          centerLocation.longitude,
-          latNum,
-          lonNum
-        );
-        return dist <= 10;
-      });
-    } else if (currentLocation) {
-      filtered = staffs.filter((s) => {
-        if (s.latitude == null || s.longitude == null) return false;
-        const latNum =
-          typeof s.latitude === "string" ? parseFloat(s.latitude) : s.latitude;
-        const lonNum =
-          typeof s.longitude === "string"
-            ? parseFloat(s.longitude)
-            : s.longitude;
-        const dist = calculateDistance(
-          currentLocation.latitude,
-          currentLocation.longitude,
-          latNum,
-          lonNum
-        );
-        return dist <= 10;
-      });
-    } else {
+      setRouteStaff(parsedStaff);
       return;
     }
+
+    // If no location yet, show all staffs temporarily
+    if (!currentLocation && !searchLocation) {
+      setFilteredStaffs(staffs);
+      return;
+    }
+
+    const centerLoc = searchLocation || currentLocation;
+    if (!centerLoc) {
+      setFilteredStaffs(staffs);
+      return;
+    }
+
+    // First, filter valid staffs and calculate their distances
+    const validStaffs = staffs
+      .filter(
+        (s) =>
+          s != null &&
+          s.latitude != null &&
+          s.longitude != null &&
+          !isNaN(Number(s.latitude)) &&
+          !isNaN(Number(s.longitude))
+      )
+      .map((s) => {
+        const latNum = typeof s.latitude === "string" ? parseFloat(s.latitude) : s.latitude;
+        const lonNum = typeof s.longitude === "string" ? parseFloat(s.longitude) : s.longitude;
+
+        const dist = calculateDistance(
+          centerLoc.latitude,
+          centerLoc.longitude,
+          latNum,
+          lonNum
+        );
+
+        return { ...s, distance: dist };
+      });
+
+    // Filter by radius
+    let filtered = validStaffs.filter((s) => s.distance <= selectedRadius);
+
+    console.log(`Found ${filtered.length} staffs within ${selectedRadius}km. Distances:`,
+      filtered.map(s => `${s.name}: ${s.distance.toFixed(2)}km`).slice(0, 5)
+    );
+
+    // Apply service filter
     const selectedService = services.find(
       (svc) => svc.title === selectedServiceButton
     );
     if (selectedService && selectedService.categoryId != null) {
       filtered = filtered.filter(
         (staff) =>
+          staff.service_id != null &&
           String(staff.service_id) === String(selectedService.categoryId)
       );
     }
 
-    // --- 3. Sort option ---
+    // Apply sorting
     switch (selectedSortOption) {
       case "Distance (Low to High)":
-        filtered = [...filtered].sort((a, b) => a.distance - b.distance);
+        filtered = [...filtered].sort((a, b) => (a.distance || 0) - (b.distance || 0));
         break;
       case "Distance (High to Low)":
-        filtered = [...filtered].sort((a, b) => b.distance - a.distance);
+        filtered = [...filtered].sort((a, b) => (b.distance || 0) - (a.distance || 0));
         break;
       case "Rating (Low to High)":
         filtered = [...filtered].sort(
           (a, b) =>
-            (typeof a.rating === "number" ? a.rating : parseFloat(a.rating)) -
-            (typeof b.rating === "number" ? b.rating : parseFloat(b.rating))
+            (typeof a.rating === "number" ? a.rating : parseFloat(a.rating || "0")) -
+            (typeof b.rating === "number" ? b.rating : parseFloat(b.rating || "0"))
         );
         break;
       case "Rating (High to Low)":
         filtered = [...filtered].sort(
           (a, b) =>
-            (typeof b.rating === "number" ? b.rating : parseFloat(b.rating)) -
-            (typeof a.rating === "number" ? a.rating : parseFloat(a.rating))
+            (typeof b.rating === "number" ? b.rating : parseFloat(b.rating || "0")) -
+            (typeof a.rating === "number" ? a.rating : parseFloat(a.rating || "0"))
         );
         break;
       case "Relevance":
@@ -546,18 +554,27 @@ export default function NearbyStaffMap() {
     staffs,
     searchLocation,
     parsedStaff,
-    centerLocation,
     currentLocation,
-    search,
     selectedSortOption,
     selectedServiceButton,
+    selectedRadius,
   ]);
+  // Add this right after the useEffect that filters staffs
+  useEffect(() => {
+    console.log("=== Debug Info ===");
+    console.log("Total staffs:", staffs.length);
+    console.log("Filtered staffs:", filteredStaffs.length);
+    console.log("Selected radius:", selectedRadius, "km");
+    console.log("Current location:", currentLocation);
+    console.log("Search location:", searchLocation);
+    console.log("==================");
+  }, [staffs, filteredStaffs, selectedRadius, currentLocation, searchLocation]);
   const getColor = (light: any, dark: any) => (isDarkMode ? dark : light);
 
   const renderStaffCard = ({ item }: { item: Staff }) => (
     <ProfileCard
       data={item}
-      avatar={{ uri: item.mobile_image_url }}
+      avatar={{ uri: item.image }}
       name={item.name}
       address={item.address}
       distance={item.distance ? Number(item.distance).toFixed(1) : "N/A"}
@@ -568,11 +585,45 @@ export default function NearbyStaffMap() {
     />
   );
   const handleViewDetails = (staffData: any) => {
-    router.push({
-      pathname: "/Details",
-      params: { ...staffData, backPath: "explore" },
-    });
-    setShowDirectionsModal(false);
+    try {
+      if (!staffData || !staffData.id) {
+        Alert.alert("Error", "Invalid staff data");
+        return;
+      }
+
+      console.log("📍 Navigating to details with staff ID:", staffData.id);
+
+      // Convert all values to strings for safe navigation
+      const params: Record<string, string> = {
+        id: String(staffData.id),
+        name: String(staffData.name || ''),
+        address: String(staffData.address || ''),
+        latitude: String(staffData.latitude || ''),
+        longitude: String(staffData.longitude || ''),
+        rating: String(staffData.rating || '0'),
+        distance: String(staffData.distance || '0'),
+        service_id: String(staffData.service_id || ''),
+        image: String(staffData.image || ''),
+        mobile_image_url: String(staffData.mobile_image_url || ''),
+        type: String(staffData.type || ''),
+        average_rating: String(staffData.average_rating || staffData.rating || '0'),
+        hourly_rate: String(staffData.hourly_rate || ''),
+        reviews: String(staffData.reviews || '0'),
+        price: String(staffData.price || ''),
+        city: String(staffData.city || ''),
+        backPath: "explore",
+      };
+
+      router.push({
+        pathname: "/Details",
+        params: params,
+      });
+
+      setShowDirectionsModal(false);
+    } catch (error) {
+      console.error("❌ Navigation error:", error);
+      Alert.alert("Navigation Error", "Failed to open details page. Please try again.");
+    }
   };
 
   useEffect(() => {
@@ -720,6 +771,7 @@ export default function NearbyStaffMap() {
               (staff) =>
                 staff.latitude != null &&
                 staff.longitude != null && (
+                  // In your Marker onPress:
                   <Marker
                     key={staff.id}
                     coordinate={{
@@ -735,6 +787,7 @@ export default function NearbyStaffMap() {
                       ),
                     }}
                     onPress={() => {
+                      console.log("Staff selected:", staff); // Debug log
                       setSelectedStaff(staff);
                       setRouteStaff(null);
                       setShowRoute(false);
@@ -1249,13 +1302,6 @@ export default function NearbyStaffMap() {
                     setDistanceText("");
                     setDurationText("");
                     setParsedStaff(null);
-                    router.push({
-                      pathname: "/Details",
-                      params: {
-                        ...selectedStaff,
-                        backPath: "default",
-                      },
-                    });
                   }}
                 >
                   <Entypo name="cross" size={24} color="red" />

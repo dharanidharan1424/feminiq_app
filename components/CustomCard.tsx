@@ -48,9 +48,35 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
   };
 
   const handleCardPress = (staffData: any) => {
+    if (!staffData || !staffData.id) {
+      console.error("Invalid staff data");
+      return;
+    }
+
+    // Convert all values to strings for safe navigation
+    const params: Record<string, string> = {
+      id: String(staffData.id),
+      name: String(staffData.name || ''),
+      address: String(staffData.address || ''),
+      latitude: String(staffData.latitude || ''),
+      longitude: String(staffData.longitude || ''),
+      rating: String(staffData.rating || '0'),
+      distance: String(staffData.distance || '0'),
+      service_id: String(staffData.service_id || ''),
+      image: String(staffData.image || ''),
+      mobile_image_url: String(staffData.mobile_image_url || ''),
+      type: String(staffData.type || ''),
+      average_rating: String(staffData.average_rating || staffData.rating || '0'),
+      hourly_rate: String(staffData.hourly_rate || ''),
+      reviews: String(staffData.reviews || '0'),
+      price: String(staffData.price || ''),
+      city: String(staffData.city || ''),
+      backPath: String(backPath || 'explore'),
+    };
+
     router.push({
       pathname: "/Details",
-      params: { ...staffData, backPath: backPath },
+      params: params,
     });
   };
   // Address masking logic
@@ -67,6 +93,11 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
       }
       displayedAddress = mainPart;
     }
+  } else if (data?.type === "parlour" && address) {
+    const city = data?.city;
+    if (city && !address.toLowerCase().includes(city.toLowerCase())) {
+      displayedAddress = `${address}, ${city}`;
+    }
   }
 
   const { isDarkMode, showToast } = useAuth();
@@ -78,14 +109,15 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
   const iconColor = "#FF5ACC";
   const borderColor = isDarkMode ? "#444" : "transparent";
 
-  const showTick = data && tickStaffIds.includes(data.id);
+  // Show tick for all solo and parlour staff
+  const showTick = data && (data.type === "solo" || data.type === "parlour");
 
   // Tick color based on type
   const tickColor =
     data?.type === "solo"
-      ? "#3B82F6"
-      : data?.type === "studio"
-        ? "#10B981"
+      ? "#3B82F6" // Blue for Solo
+      : data?.type === "parlour"
+        ? "#10B981" // Green for Parlour
         : null;
 
   return (

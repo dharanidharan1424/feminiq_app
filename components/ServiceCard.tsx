@@ -1,22 +1,22 @@
 /* eslint-disable no-unused-expressions */
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  Modal,
-  Pressable,
-} from "react-native";
+import { useAuth } from "@/context/UserContext";
 import {
   FontAwesome6,
   Ionicons,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
-import { router } from "expo-router";
-import { useAuth } from "@/context/UserContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
+import React, { useEffect, useState } from "react";
+import {
+  Image,
+  Modal,
+  Pressable,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 interface ServiceData {
   id: number;
@@ -126,12 +126,33 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
   return (
     <TouchableOpacity
       onPress={() => {
-        staffView
-          ? router.push({
-              pathname: "/Details",
-              params: { ...staffData, type: "service" },
-            })
-          : setModalVisible(true);
+        if (staffView && staffData) {
+          const params: Record<string, string> = {
+            id: String(staffData.id || ''),
+            name: String(staffData.name || ''),
+            address: String(staffData.address || ''),
+            latitude: String(staffData.latitude || ''),
+            longitude: String(staffData.longitude || ''),
+            rating: String(staffData.rating || '0'),
+            distance: String(staffData.distance || '0'),
+            service_id: String(staffData.service_id || ''),
+            image: String(staffData.image || ''),
+            mobile_image_url: String(staffData.mobile_image_url || ''),
+            type: 'service',
+            average_rating: String(staffData.average_rating || staffData.rating || '0'),
+            hourly_rate: String(staffData.hourly_rate || ''),
+            reviews: String(staffData.reviews || '0'),
+            price: String(staffData.price || ''),
+            city: String(staffData.city || ''),
+            backPath: 'explore',
+          };
+          router.push({
+            pathname: "/Details",
+            params: params,
+          });
+        } else {
+          setModalVisible(true);
+        }
       }}
     >
       <ScrollView
@@ -228,11 +249,10 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
 
             <TouchableOpacity
               onPress={addToCart}
-              className={`px-3 py-1 rounded-full border flex-row items-center ${
-                isInCart
+              className={`px-3 py-1 rounded-full border flex-row items-center ${isInCart
                   ? "bg-green-100 border-green-500"
                   : "bg-pink-100 border-primary"
-              }`}
+                }`}
             >
               <MaterialCommunityIcons
                 name={isInCart ? "cart-check" : "cart-plus"}
@@ -317,12 +337,33 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
               )}
               {staffView && (
                 <TouchableOpacity
-                  onPress={() =>
-                    router.push({
-                      pathname: "/Details",
-                      params: { ...staffData, type: "service" },
-                    })
-                  }
+                  onPress={() => {
+                    if (staffData) {
+                      const params: Record<string, string> = {
+                        id: String(staffData.id || ''),
+                        name: String(staffData.name || ''),
+                        address: String(staffData.address || ''),
+                        latitude: String(staffData.latitude || ''),
+                        longitude: String(staffData.longitude || ''),
+                        rating: String(staffData.rating || '0'),
+                        distance: String(staffData.distance || '0'),
+                        service_id: String(staffData.service_id || ''),
+                        image: String(staffData.image || ''),
+                        mobile_image_url: String(staffData.mobile_image_url || ''),
+                        type: 'service',
+                        average_rating: String(staffData.average_rating || staffData.rating || '0'),
+                        hourly_rate: String(staffData.hourly_rate || ''),
+                        reviews: String(staffData.reviews || '0'),
+                        price: String(staffData.price || ''),
+                        city: String(staffData.city || ''),
+                        backPath: 'explore',
+                      };
+                      router.push({
+                        pathname: "/Details",
+                        params: params,
+                      });
+                    }
+                  }}
                   className="mb-1"
                 >
                   <MaterialCommunityIcons

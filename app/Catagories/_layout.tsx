@@ -1,16 +1,5 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import React, { useEffect, useState } from "react";
-import {
-  BackHandler,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { Feather, Ionicons } from "@expo/vector-icons";
-import { useRouter, useGlobalSearchParams, Slot } from "expo-router";
 import { useAuth } from "@/context/UserContext";
-import { Wave } from "react-native-animated-spinkit";
 import {
   Poppins_400Regular,
   Poppins_500Medium,
@@ -18,6 +7,15 @@ import {
   Poppins_700Bold,
   useFonts,
 } from "@expo-google-fonts/poppins";
+import { Ionicons } from "@expo/vector-icons";
+import { Slot, useGlobalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
+import {
+  BackHandler,
+  Text,
+  View
+} from "react-native";
+import { Wave } from "react-native-animated-spinkit";
 
 const PRIMARY_LIGHT = "#FF5ACC";
 

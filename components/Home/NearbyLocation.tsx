@@ -37,6 +37,8 @@ const filterOptions = [
 ];
 
 interface Staff {
+  longitude: null | string | number;
+  latitude: null | string | number;
   id: number;
   name: string;
   address: string;
@@ -77,7 +79,7 @@ const NearbyLocation: React.FC = () => {
     null
   );
 
-  const filterTypes = ["All", "Solo", "Studio"];
+  const filterTypes = ["All", "Solo", "Parlour"];
 
   // In memo, include typeFilter dependency
 
@@ -92,6 +94,7 @@ const NearbyLocation: React.FC = () => {
         );
         const json = await response.json();
         if (json.status === "success" && Array.isArray(json.data)) {
+          console.log("Staff types from API:", json.data.map((s: any) => ({ id: s.id, name: s.name, type: s.type })));
           setStaffs(json.data);
         } else {
           setStaffs([]);
@@ -296,7 +299,7 @@ const NearbyLocation: React.FC = () => {
                         color={
                           type === "Solo"
                             ? "#2196F3" // Blue
-                            : type === "Studio"
+                            : type === "Parlour"
                               ? "#4CAF50" // Green
                               : "black" // fallback
                         }

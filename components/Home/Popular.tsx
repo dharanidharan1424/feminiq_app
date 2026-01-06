@@ -37,6 +37,8 @@ const filterOptions = [
 ];
 
 interface Staff {
+  longitude: null | string | number;
+  latitude: null | string | number;
   id: number;
   name: string;
   address: string;
@@ -46,6 +48,11 @@ interface Staff {
   image: string;
   mobile_image_url: string;
   type: string;
+  average_rating?: string;
+  hourly_rate?: string;
+  reviews?: string;
+  price?: string;
+  city?: string;
 }
 
 const SERVICES = [
@@ -90,7 +97,7 @@ const Popular: React.FC = () => {
     null
   );
 
-  const filterTypes = ["All", "Solo", "Studio"];
+  const filterTypes = ["All", "Solo", "Parlour"];
 
   // In memo, include typeFilter dependency
 
@@ -330,7 +337,7 @@ const Popular: React.FC = () => {
                         color={
                           type === "Solo"
                             ? "#2196F3" // Blue
-                            : type === "Studio"
+                            : type === "Parlour"
                               ? "#4CAF50" // Green
                               : "black" // fallback
                         }

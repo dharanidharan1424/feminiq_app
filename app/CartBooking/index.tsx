@@ -410,8 +410,8 @@ export default function BookingPage() {
         </Text>
         <TouchableOpacity
           className={`flex-row justify-between items-center border rounded-lg px-4 py-2 ${isDarkMode
-              ? "bg-gray-800 border-gray-600"
-              : "bg-primary/10 border-primary"
+            ? "bg-gray-800 border-gray-600"
+            : "bg-primary/10 border-primary"
             }`}
           onPress={toggleModal}
         >
@@ -502,19 +502,19 @@ export default function BookingPage() {
             {/* Customer Location */}
             <TouchableOpacity
               className={`flex-1 py-3 mx-1 rounded-xl border ${locationSelection === "customer_location"
-                  ? "bg-primary/10 border-primary"
-                  : isDarkMode
-                    ? "bg-gray-800 border-gray-600"
-                    : "bg-gray-100 border-gray-300"
+                ? "bg-primary/10 border-primary"
+                : isDarkMode
+                  ? "bg-gray-800 border-gray-600"
+                  : "bg-gray-100 border-gray-300"
                 }`}
               onPress={() => selectLocation("customer_location")}
             >
               <Text
                 className={`text-center font-poppins-medium ${locationSelection === "customer_location"
-                    ? "text-primary"
-                    : isDarkMode
-                      ? "text-white"
-                      : "text-gray-600"
+                  ? "text-primary"
+                  : isDarkMode
+                    ? "text-white"
+                    : "text-gray-600"
                   }`}
               >
                 Customer Location
@@ -524,19 +524,19 @@ export default function BookingPage() {
             {/* Provider Location */}
             <TouchableOpacity
               className={`flex-1 py-3 mx-1 rounded-xl border ${locationSelection === "provider_location"
-                  ? "bg-primary/10 border-primary"
-                  : isDarkMode
-                    ? "bg-gray-800 border-gray-600"
-                    : "bg-gray-100 border-gray-300"
+                ? "bg-primary/10 border-primary"
+                : isDarkMode
+                  ? "bg-gray-800 border-gray-600"
+                  : "bg-gray-100 border-gray-300"
                 }`}
               onPress={() => selectLocation("provider_location")}
             >
               <Text
                 className={`text-center font-poppins-medium ${locationSelection === "provider_location"
-                    ? "text-primary"
-                    : isDarkMode
-                      ? "text-white"
-                      : "text-gray-600"
+                  ? "text-primary"
+                  : isDarkMode
+                    ? "text-white"
+                    : "text-gray-600"
                   }`}
               >
                 Provider Location
@@ -557,19 +557,19 @@ export default function BookingPage() {
               {/* Current Location */}
               <TouchableOpacity
                 className={`p-3 rounded-xl border mb-2 ${customerLocationSelection === "current_location"
-                    ? "bg-primary/10 border-primary"
-                    : isDarkMode
-                      ? "bg-gray-800 border-gray-600"
-                      : "bg-gray-100 border-gray-300"
+                  ? "bg-primary/10 border-primary"
+                  : isDarkMode
+                    ? "bg-gray-800 border-gray-600"
+                    : "bg-gray-100 border-gray-300"
                   }`}
                 onPress={() => selectCustomerLocationOption("current_location")}
               >
                 <Text
                   className={`font-poppins-medium ${customerLocationSelection === "current_location"
-                      ? "text-primary"
-                      : isDarkMode
-                        ? "text-white"
-                        : "text-gray-600"
+                    ? "text-primary"
+                    : isDarkMode
+                      ? "text-white"
+                      : "text-gray-600"
                     }`}
                 >
                   Current Location
@@ -587,19 +587,19 @@ export default function BookingPage() {
               {/* Profile Address */}
               <TouchableOpacity
                 className={`p-3 rounded-xl border mb-2 ${customerLocationSelection === "profile_address"
-                    ? "bg-primary/10 border-primary"
-                    : isDarkMode
-                      ? "bg-gray-800 border-gray-600"
-                      : "bg-gray-100 border-gray-300"
+                  ? "bg-primary/10 border-primary"
+                  : isDarkMode
+                    ? "bg-gray-800 border-gray-600"
+                    : "bg-gray-100 border-gray-300"
                   }`}
                 onPress={() => selectCustomerLocationOption("profile_address")}
               >
                 <Text
                   className={`font-poppins-medium ${customerLocationSelection === "profile_address"
-                      ? "text-primary"
-                      : isDarkMode
-                        ? "text-white"
-                        : "text-gray-600"
+                    ? "text-primary"
+                    : isDarkMode
+                      ? "text-white"
+                      : "text-gray-600"
                     }`}
                 >
                   Profile Address
@@ -615,10 +615,10 @@ export default function BookingPage() {
               </TouchableOpacity>
               <TouchableOpacity
                 className={`p-3 rounded-xl border ${customerLocationSelection === "alternative_address"
-                    ? "bg-primary/10 border-primary"
-                    : isDarkMode
-                      ? "bg-gray-800 border-gray-600"
-                      : "bg-gray-100 border-gray-300"
+                  ? "bg-primary/10 border-primary"
+                  : isDarkMode
+                    ? "bg-gray-800 border-gray-600"
+                    : "bg-gray-100 border-gray-300"
                   }`}
                 onPress={() =>
                   selectCustomerLocationOption("alternative_address")
@@ -626,10 +626,10 @@ export default function BookingPage() {
               >
                 <Text
                   className={`font-poppins-medium ${customerLocationSelection === "alternative_address"
-                      ? "text-primary"
-                      : isDarkMode
-                        ? "text-white"
-                        : "text-gray-600"
+                    ? "text-primary"
+                    : isDarkMode
+                      ? "text-white"
+                      : "text-gray-600"
                     }`}
                 >
                   Alternative Address

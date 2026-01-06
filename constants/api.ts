@@ -6,7 +6,7 @@ export const API_CONFIG = {
     // Razorpay Configuration
     // NOTE: Replace with your actual Razorpay key ID
     // For production, consider using environment variables
-    RAZORPAY_KEY_ID: "rzp_test_your_key_id", // TODO: Replace with actual key
+    RAZORPAY_KEY_ID: "rzp_test_RDvOg9RtgwnB5k", // TODO: Replace with actual key
 
     // Endpoints
     ENDPOINTS: {

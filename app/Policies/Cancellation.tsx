@@ -2,30 +2,31 @@ import { useAuth } from "@/context/UserContext";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface SectionProps {
   title: string;
   children: React.ReactNode;
-  primaryColor: string;
+  isDarkMode: boolean;
 }
 
 interface BoldTextProps {
   children: React.ReactNode;
+  isDarkMode: boolean;
 }
 
 // Reusable UI Components
-const Section = ({ title, children, primaryColor }: SectionProps) => (
-  <View className="border-b border-gray-300 dark:border-gray-600 pb-6 mb-8">
-    <Text className={`mb-3 text-lg font-poppins-semibold ${primaryColor}`}>
+const Section = ({ title, children, isDarkMode }: SectionProps) => (
+  <View style={[styles.section, { borderBottomColor: isDarkMode ? "#444" : "#d1d5db" }]}>
+    <Text style={[styles.sectionTitle, { color: "#FF5ACC" }]}>
       {title}
     </Text>
     {children}
   </View>
 );
 
-const B = ({ children }: BoldTextProps) => (
-  <Text className="font-poppins-semibold text-gray-900 dark:text-gray-200">
+const B = ({ children, isDarkMode }: BoldTextProps) => (
+  <Text style={{ fontFamily: "Poppins_600SemiBold", color: isDarkMode ? "#e5e7eb" : "#111827" }}>
     {children}
   </Text>
 );
@@ -33,114 +34,101 @@ const B = ({ children }: BoldTextProps) => (
 const CancellationPolicy: React.FC = () => {
   const { isDarkMode } = useAuth();
 
-  const textColor = isDarkMode ? "text-gray-300" : "text-gray-700";
-  const primaryColor = "text-primary";
+  const backgroundColor = isDarkMode ? "#222" : "#fff";
+  const textColor = isDarkMode ? "#d1d5db" : "#374151";
+  const headerTextColor = isDarkMode ? "#eee" : "#222";
 
   return (
-    <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
+    <ScrollView style={{ backgroundColor }} contentContainerStyle={{ paddingBottom: 80 }}>
       {/* Header */}
-      <View className="flex-row items-center mb-4 px-3 py-4 border-b border-gray-200">
+      <View style={{
+        flexDirection: "row",
+        alignItems: "center",
+        marginBottom: 16,
+        paddingHorizontal: 12,
+        paddingVertical: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: isDarkMode ? "#333" : "#e5e7eb",
+      }}>
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons
             name="arrow-back"
             size={24}
-            color={isDarkMode ? "#eee" : "#222"}
+            color={headerTextColor}
           />
         </TouchableOpacity>
 
-        <Text className={`ml-4 text-xl font-poppins-semibold ${textColor}`}>
+        <Text style={[styles.headerTitle, { color: headerTextColor }]}>
           Cancellation & Refund Policy
         </Text>
       </View>
 
-      <View className="px-6">
-        <Text className="font-poppins-regular">
-          Effective Date: <B>14 November 2025</B>
+      <View style={{ paddingHorizontal: 24 }}>
+        <Text style={{ fontFamily: "Poppins_400Regular", color: textColor }}>
+          Effective Date: <B isDarkMode={isDarkMode}>14 November 2025</B>
         </Text>
         {/* Intro */}
-        <View className="border-b border-gray-300 mb-4 pb-4">
-          <Text
-            className={`mt-2 mb-4 text-lg font-poppins-semibold ${primaryColor}`}
-          >
-            This policy governs rescheduling, cancellations, refunds, and
-            chargebacks for customers booking services via Feminiq.
+        <View style={{ borderBottomWidth: 1, borderBottomColor: isDarkMode ? "#444" : "#d1d5db", marginBottom: 16, paddingBottom: 16 }}>
+          <Text style={{ marginTop: 8, marginBottom: 16, fontSize: 18, fontFamily: "Poppins_600SemiBold", color: "#FF5ACC" }}>
+            This policy governs rescheduling, cancellations, refunds, and chargebacks for customers booking services via Feminiq.
           </Text>
 
-          <Text
-            className={` text-base font-poppins-regular ${textColor} leading-relaxed`}
-          >
-            By using Feminiq, you agree to comply with this policy and
-            Feminiq&apos;s <B>Terms of Service</B>.
+          <Text style={{ fontSize: 16, fontFamily: "Poppins_400Regular", color: textColor, lineHeight: 24 }}>
+            By using Feminiq, you agree to comply with this policy and Feminiq's <B isDarkMode={isDarkMode}>Terms of Service</B>.
           </Text>
         </View>
 
         {/* All Sections */}
-        <Section
-          title="1. Rescheduling Appointments"
-          primaryColor={primaryColor}
-        >
-          <Text
-            className={`text-base leading-relaxed font-poppins-regular ${textColor}`}
-          >
-            • Customers may reschedule appointments up to <B>24 hours before</B>{" "}
-            the scheduled service time, subject to availability.
-            {"\n"}• Rescheduling within 24 hours of the appointment is not
-            permitted. In such cases, you may either attend the original booking
-            or cancel according to the cancellation policy.
+        <Section title="1. Rescheduling Appointments" isDarkMode={isDarkMode}>
+          <Text style={{ fontSize: 16, lineHeight: 24, fontFamily: "Poppins_400Regular", color: textColor }}>
+            • Customers may reschedule appointments up to <B isDarkMode={isDarkMode}>24 hours before</B> the scheduled service time, subject to availability.{"\n"}• Rescheduling within 24 hours of the appointment is not permitted. In such cases, you may either attend the original booking or cancel according to the cancellation policy.
           </Text>
         </Section>
 
-        <Section title="2. Cancellation Policy" primaryColor={primaryColor}>
-          <Text
-            className={`text-base leading-relaxed font-poppins-regular ${textColor}`}
-          >
-            • <B>More than 24 hours before appointment:</B> Full refund.
-            {"\n"}• <B>Within 24 hours of appointment:</B> 80% refund. 20% is
-            retained for administrative, preparation, and late-cancellation
-            costs.
+        <Section title="2. Cancellation Policy" isDarkMode={isDarkMode}>
+          <Text style={{ fontSize: 16, lineHeight: 24, fontFamily: "Poppins_400Regular", color: textColor }}>
+            • <B isDarkMode={isDarkMode}>More than 24 hours before appointment:</B> Full refund.{"\n"}• <B isDarkMode={isDarkMode}>Within 24 hours of appointment:</B> 80% refund. 20% is retained for administrative, preparation, and late-cancellation costs.
           </Text>
         </Section>
 
-        <Section title="3. Refunds" primaryColor={primaryColor}>
-          <Text
-            className={`text-base ${textColor} leading-relaxed font-poppins-regular`}
-          >
-            • Refunds are processed only via the official{" "}
-            <B>Feminiq payment platform</B>.{"\n"}• Credit timelines may vary
-            depending on your bank or payment method but are typically completed
-            within <B>3-5 business days</B>.
+        <Section title="3. Refunds" isDarkMode={isDarkMode}>
+          <Text style={{ fontSize: 16, color: textColor, lineHeight: 24, fontFamily: "Poppins_400Regular" }}>
+            • Refunds are processed only via the official <B isDarkMode={isDarkMode}>Feminiq payment platform</B>.{"\n"}• Credit timelines may vary depending on your bank or payment method but are typically completed within <B isDarkMode={isDarkMode}>3-5 business days</B>.
           </Text>
         </Section>
 
-        <Section title="4. Chargebacks" primaryColor={primaryColor}>
-          <Text
-            className={`text-base ${textColor} leading-relaxed font-poppins-regular`}
-          >
-            • Customers should not initiate chargebacks without first contacting{" "}
-            <Text className={primaryColor}>support@feminiq.in</Text>
-            {"\n"}• Unauthorized or fraudulent chargebacks may result in:
-            {"\n"} o Account suspension or termination
-            {"\n"} o Denial of future bookings
-            {"\n"} o Legal action as applicable
-            {"\n"}
-            <B>Please reach out to us before disputing any charges.</B>
+        <Section title="4. Chargebacks" isDarkMode={isDarkMode}>
+          <Text style={{ fontSize: 16, color: textColor, lineHeight: 24, fontFamily: "Poppins_400Regular" }}>
+            • Customers should not initiate chargebacks without first contacting <Text style={{ color: "#FF5ACC" }}>support@feminiq.in</Text>{"\n"}• Unauthorized or fraudulent chargebacks may result in:{"\n"} o Account suspension or termination{"\n"} o Denial of future bookings{"\n"} o Legal action as applicable{"\n"}<B isDarkMode={isDarkMode}>Please reach out to us before disputing any charges.</B>
           </Text>
         </Section>
 
-        <Section title="5. General Guidelines" primaryColor={primaryColor}>
-          <Text className={`${textColor} leading-relaxed font-poppins-regular`}>
-            • All bookings, cancellations, and refunds must be completed through
-            the <B>Feminiq platform</B>.{"\n"}• Feminiq is not liable for any
-            arrangements or payments made outside the platform.
-            {"\n"}• Feminiq may update this policy as required to ensure
-            fairness, transparency, and compliance with applicable laws.
-            {"\n"}
-            <B>Always use the official platform for secure transactions.</B>
+        <Section title="5. General Guidelines" isDarkMode={isDarkMode}>
+          <Text style={{ color: textColor, lineHeight: 24, fontFamily: "Poppins_400Regular", fontSize: 16 }}>
+            • All bookings, cancellations, and refunds must be completed through the <B isDarkMode={isDarkMode}>Feminiq platform</B>.{"\n"}• Feminiq is not liable for any arrangements or payments made outside the platform.{"\n"}• Feminiq may update this policy as required to ensure fairness, transparency, and compliance with applicable laws.{"\n"}<B isDarkMode={isDarkMode}>Always use the official platform for secure transactions.</B>
           </Text>
         </Section>
       </View>
     </ScrollView>
   );
 };
+
+const styles = StyleSheet.create({
+  headerTitle: {
+    marginLeft: 16,
+    fontSize: 20,
+    fontFamily: "Poppins_600SemiBold",
+  },
+  section: {
+    borderBottomWidth: 1,
+    paddingBottom: 24,
+    marginBottom: 32,
+  },
+  sectionTitle: {
+    marginBottom: 12,
+    fontSize: 18,
+    fontFamily: "Poppins_600SemiBold",
+  },
+});
 
 export default CancellationPolicy;

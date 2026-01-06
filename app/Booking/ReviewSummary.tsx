@@ -1,27 +1,26 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useEffect, useRef } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
+  ActivityIndicator,
+  BackHandler,
   Modal,
   SafeAreaView,
-  BackHandler,
+  ScrollView,
+  Text,
   TextInput,
-  ActivityIndicator,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { router, useLocalSearchParams } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 // import RazorpayCheckout from "react-native-razorpay";
+import BubbleScatter from "@/components/Animation/BubbleScatter";
+import { API_CONFIG, buildApiUrl } from "@/constants/api";
 import { useAuth } from "@/context/UserContext";
 import { Flow } from "react-native-animated-spinkit";
-import RazorpayCheckout from "react-native-razorpay";
-import BubbleScatter from "@/components/Animation/BubbleScatter";
 import Confetti from "react-native-confetti";
-import { API_CONFIG, buildApiUrl } from "@/constants/api";
-import Constants from "expo-constants";
+import RazorpayCheckout from "react-native-razorpay";
 
 interface BookingData {
   paymentMethod: string;
@@ -384,7 +383,7 @@ export default function ReviewSummary() {
     try {
       // Step 1: Create Razorpay order via backend API
       const orderResponse = await fetch(
-        "https://feminiq-backend.onrender.com/payments/create-order",
+        "https://femiiniq-backend.onrender.com/payments/create-order",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -405,7 +404,7 @@ export default function ReviewSummary() {
       const razorpayOptions = {
         description: "Feminiq Booking Payment",
         currency: "INR",
-        key: Constants.expoConfig?.extra?.razorpayKeyId || "rzp_test_your_key_id",
+        key: "rzp_test_RDvOg9RtgwnB5k",
         amount: finalAmount * 100,
         order_id: orderData.id,
         name: "Feminiq",
@@ -421,7 +420,7 @@ export default function ReviewSummary() {
         .then(async (data: any) => {
           // Step 3: Verify payment via backend API
           const verifyResponse = await fetch(
-            "https://feminiq-backend.onrender.com/payments/verify-payment",
+            "https://femiiniq-backend.onrender.com/payments/verify-payment",
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -477,7 +476,7 @@ export default function ReviewSummary() {
           };
 
           const response = await fetch(
-            "https://feminiq-backend.onrender.com/booking",
+            "https://femiiniq-backend.onrender.com/booking",
             {
               method: "POST",
               credentials: "include",

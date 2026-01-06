@@ -1,17 +1,16 @@
+import { supabase } from "@/config/supabase";
 import { useAuth } from "@/context/UserContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   Image,
   ScrollView,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
-import { supabase } from "@/config/supabase";
-import { router } from "expo-router";
 import { Chase } from "react-native-animated-spinkit";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface StaffChat {
   staff_id: number;
@@ -84,7 +83,7 @@ const Chats = () => {
       setLoading(true);
       try {
         const response = await fetch(
-          "https://feminiq-backend.onrender.com/api/get-staffs"
+          "https://femiiniq-backend.onrender.com/api/get-staffs"
         );
         const json = await response.json();
         if (json.status === "success" && Array.isArray(json.data)) {

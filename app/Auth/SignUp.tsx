@@ -39,6 +39,15 @@ const SignUp = () => {
   const [confirmError, setConfirmError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Password validation states
+  const [passwordValidation, setPasswordValidation] = useState({
+    minLength: false,
+    hasUppercase: false,
+    hasLowercase: false,
+    hasNumber: false,
+    hasSpecialChar: false,
+  });
+
   const [modalVisible, setModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalMessage, setModalMessage] = useState("");
@@ -66,6 +75,17 @@ const SignUp = () => {
     console.log("Login Failed: ", errorMessage);
   };
 
+  // Validate password requirements in real-time
+  const validatePassword = (pwd: string) => {
+    setPasswordValidation({
+      minLength: pwd.length >= 8,
+      hasUppercase: /[A-Z]/.test(pwd),
+      hasLowercase: /[a-z]/.test(pwd),
+      hasNumber: /[0-9]/.test(pwd),
+      hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(pwd),
+    });
+  };
+
   const emailRegex = /\S+@\S+\.\S+/;
 
   // Main signup logic
@@ -89,6 +109,18 @@ const SignUp = () => {
       valid = false;
     } else if (password.length < 8) {
       setPasswordError("Password must be at least 8 characters");
+      valid = false;
+    } else if (!/[A-Z]/.test(password)) {
+      setPasswordError("Password must contain at least one uppercase letter");
+      valid = false;
+    } else if (!/[a-z]/.test(password)) {
+      setPasswordError("Password must contain at least one lowercase letter");
+      valid = false;
+    } else if (!/[0-9]/.test(password)) {
+      setPasswordError("Password must contain at least one number");
+      valid = false;
+    } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      setPasswordError("Password must contain at least one special character");
       valid = false;
     }
 
@@ -307,7 +339,10 @@ const SignUp = () => {
         <CustomInput
           placeholder="Password"
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(text) => {
+            setPassword(text);
+            validatePassword(text);
+          }}
           leftIconName="lock-closed"
           rightIconName={secureTextEntry ? "eye-off-outline" : "eye-outline"}
           secureTextEntry={secureTextEntry}
@@ -329,6 +364,136 @@ const SignUp = () => {
             {passwordError}
           </Text>
         ) : null}
+
+        {/* Password Validation UI - Shows when user starts typing */}
+        {password.length > 0 && (
+          <View
+            style={{
+              marginTop: 12,
+              padding: 16,
+              backgroundColor: isDarkMode ? "#2a2a2a" : "#f8f9fa",
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: isDarkMode ? "#3a3a3a" : "#e5e7eb",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 14,
+                fontFamily: "Poppins_600SemiBold",
+                color: textColor,
+                marginBottom: 12,
+              }}
+            >
+              Password Requirements:
+            </Text>
+
+            {/* Minimum Length */}
+            <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
+              <Ionicons
+                name={passwordValidation.minLength ? "checkmark-circle" : "close-circle"}
+                size={20}
+                color={passwordValidation.minLength ? "#10b981" : "#ef4444"}
+                style={{ marginRight: 8 }}
+              />
+              <Text
+                style={{
+                  fontSize: 13,
+                  fontFamily: "Poppins_400Regular",
+                  color: passwordValidation.minLength
+                    ? isDarkMode ? "#10b981" : "#059669"
+                    : isDarkMode ? "#ef4444" : "#dc2626",
+                }}
+              >
+                At least 8 characters
+              </Text>
+            </View>
+
+            {/* Uppercase Letter */}
+            <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
+              <Ionicons
+                name={passwordValidation.hasUppercase ? "checkmark-circle" : "close-circle"}
+                size={20}
+                color={passwordValidation.hasUppercase ? "#10b981" : "#ef4444"}
+                style={{ marginRight: 8 }}
+              />
+              <Text
+                style={{
+                  fontSize: 13,
+                  fontFamily: "Poppins_400Regular",
+                  color: passwordValidation.hasUppercase
+                    ? isDarkMode ? "#10b981" : "#059669"
+                    : isDarkMode ? "#ef4444" : "#dc2626",
+                }}
+              >
+                One uppercase letter (A-Z)
+              </Text>
+            </View>
+
+            {/* Lowercase Letter */}
+            <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
+              <Ionicons
+                name={passwordValidation.hasLowercase ? "checkmark-circle" : "close-circle"}
+                size={20}
+                color={passwordValidation.hasLowercase ? "#10b981" : "#ef4444"}
+                style={{ marginRight: 8 }}
+              />
+              <Text
+                style={{
+                  fontSize: 13,
+                  fontFamily: "Poppins_400Regular",
+                  color: passwordValidation.hasLowercase
+                    ? isDarkMode ? "#10b981" : "#059669"
+                    : isDarkMode ? "#ef4444" : "#dc2626",
+                }}
+              >
+                One lowercase letter (a-z)
+              </Text>
+            </View>
+
+            {/* Number */}
+            <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
+              <Ionicons
+                name={passwordValidation.hasNumber ? "checkmark-circle" : "close-circle"}
+                size={20}
+                color={passwordValidation.hasNumber ? "#10b981" : "#ef4444"}
+                style={{ marginRight: 8 }}
+              />
+              <Text
+                style={{
+                  fontSize: 13,
+                  fontFamily: "Poppins_400Regular",
+                  color: passwordValidation.hasNumber
+                    ? isDarkMode ? "#10b981" : "#059669"
+                    : isDarkMode ? "#ef4444" : "#dc2626",
+                }}
+              >
+                One number (0-9)
+              </Text>
+            </View>
+
+            {/* Special Character */}
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Ionicons
+                name={passwordValidation.hasSpecialChar ? "checkmark-circle" : "close-circle"}
+                size={20}
+                color={passwordValidation.hasSpecialChar ? "#10b981" : "#ef4444"}
+                style={{ marginRight: 8 }}
+              />
+              <Text
+                style={{
+                  fontSize: 13,
+                  fontFamily: "Poppins_400Regular",
+                  color: passwordValidation.hasSpecialChar
+                    ? isDarkMode ? "#10b981" : "#059669"
+                    : isDarkMode ? "#ef4444" : "#dc2626",
+                }}
+              >
+                One special character (!@#$%^&*...)
+              </Text>
+            </View>
+          </View>
+        )}
 
         {showConfirmPassword && (
           <>

@@ -1,3 +1,5 @@
+import Toast from "@/components/CustomToast"; // Your custom toast component
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, {
   createContext,
   ReactNode,
@@ -5,8 +7,6 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import Toast from "@/components/CustomToast"; // Your custom toast component
 
 interface User {
   email: string;

@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { Slot } from "expo-router";
-import React from "react";
-import { StatusBar, View } from "react-native";
+import React, { useEffect } from "react";
+import { View } from "react-native";
 import "./globals.css";
 
 import { AuthProvider } from "@/context/UserContext";
@@ -12,8 +12,8 @@ import {
   Poppins_700Bold,
   useFonts,
 } from "@expo-google-fonts/poppins";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Wave } from "react-native-animated-spinkit";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const _layout = () => {
   const [fontsLoaded] = useFonts({
@@ -22,6 +22,30 @@ const _layout = () => {
     Poppins_600SemiBold,
     Poppins_700Bold,
   });
+
+  // Clear corrupted navigation state
+  useEffect(() => {
+    const clearNavigationState = async () => {
+      try {
+        const keys = await AsyncStorage.getAllKeys();
+        const navKeys = keys.filter(key =>
+          key.includes('NAVIGATION') ||
+          key.includes('navigation') ||
+          key.includes('@react-navigation')
+        );
+
+        if (navKeys.length > 0) {
+          await AsyncStorage.multiRemove(navKeys);
+          console.log('✅ Cleared navigation states:', navKeys);
+        }
+      } catch (error) {
+        console.error('❌ Failed to clear navigation state:', error);
+      }
+    };
+
+    // Run once on app start
+    clearNavigationState();
+  }, []);
 
   if (!fontsLoaded) {
     return (

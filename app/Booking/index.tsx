@@ -525,10 +525,10 @@ export default function BookingPage() {
           <View className="flex-row justify-around mb-4">
             <TouchableOpacity
               className={`flex-1 py-3 mx-1 rounded-xl border ${locationSelection === "customer_location"
-                  ? "border-primary"
-                  : isDarkMode
-                    ? "border-gray-600"
-                    : "border-gray-300"
+                ? "border-primary"
+                : isDarkMode
+                  ? "border-gray-600"
+                  : "border-gray-300"
                 }`}
               style={{
                 backgroundColor:
@@ -557,10 +557,10 @@ export default function BookingPage() {
 
             <TouchableOpacity
               className={`flex-1 py-3 mx-1 rounded-xl border ${locationSelection === "provider_location"
-                  ? "border-primary"
-                  : isDarkMode
-                    ? "border-gray-600"
-                    : "border-gray-300"
+                ? "border-primary"
+                : isDarkMode
+                  ? "border-gray-600"
+                  : "border-gray-300"
                 }`}
               style={{
                 backgroundColor:
@@ -599,10 +599,10 @@ export default function BookingPage() {
 
               <TouchableOpacity
                 className={`p-3 rounded-xl border mb-2 ${customerLocationSelection === "current_location"
-                    ? "border-primary"
-                    : isDarkMode
-                      ? "border-gray-600"
-                      : "border-gray-300"
+                  ? "border-primary"
+                  : isDarkMode
+                    ? "border-gray-600"
+                    : "border-gray-300"
                   }`}
                 style={{
                   backgroundColor:
@@ -639,10 +639,10 @@ export default function BookingPage() {
 
               <TouchableOpacity
                 className={`p-3 rounded-xl border mb-2 ${customerLocationSelection === "profile_address"
-                    ? "border-primary"
-                    : isDarkMode
-                      ? "border-gray-600"
-                      : "border-gray-300"
+                  ? "border-primary"
+                  : isDarkMode
+                    ? "border-gray-600"
+                    : "border-gray-300"
                   }`}
                 style={{
                   backgroundColor:
@@ -678,10 +678,10 @@ export default function BookingPage() {
               </TouchableOpacity>
               <TouchableOpacity
                 className={`p-3 rounded-xl border ${customerLocationSelection === "alternative_address"
-                    ? "border-primary"
-                    : isDarkMode
-                      ? "border-gray-600"
-                      : "border-gray-300"
+                  ? "border-primary"
+                  : isDarkMode
+                    ? "border-gray-600"
+                    : "border-gray-300"
                   }`}
                 style={{
                   backgroundColor:

@@ -1,14 +1,24 @@
-/* eslint-disable react-hooks/rules-of-hooks */
-import { Slot } from "expo-router";
-import { View } from "react-native";
-import "../../globals.css";
+import { Stack } from "expo-router";
 
-const _layout = () => {
-  return (
-    <View className="flex-1">
-      <Slot />
-    </View>
-  );
-};
-
-export default _layout;
+export default function ProfileLayout() {
+    return (
+        <Stack
+            screenOptions={{
+                headerShown: false,
+            }}
+        >
+            <Stack.Screen name="index" options={{ title: "Profile" }} />
+            <Stack.Screen name="Faq" />
+            <Stack.Screen name="Invite" />
+            <Stack.Screen name="Report" />
+            <Stack.Screen name="Update" />
+            <Stack.Screen name="Payment" />
+            <Stack.Screen name="Reviews" />
+            <Stack.Screen name="Language" />
+            <Stack.Screen name="Security" />
+            <Stack.Screen name="BankDetails" />
+            <Stack.Screen name="Cancellation" />
+            <Stack.Screen name="Notification" />
+        </Stack>
+    );
+}

@@ -31,8 +31,19 @@ import Reviews from "./Reviews";
 import Services from "./Services";
 
 const index = () => {
-  const staffData = useLocalSearchParams();
-  const { type, backPath } = useLocalSearchParams(); // get extra params like "type"
+  const params = useLocalSearchParams();
+  const { type, backPath, staffData: staffDataString } = params;
+
+  // Parse staffData if it exists, otherwise use params directly
+  let staffData = params;
+  if (staffDataString && typeof staffDataString === 'string') {
+    try {
+      const parsed = JSON.parse(staffDataString);
+      staffData = { ...parsed, type, backPath };
+    } catch (e) {
+      console.error("Failed to parse staffData:", e);
+    }
+  }
   const scrollRef = useRef<ScrollView>(null);
   const [selectedTab, setSelectedTab] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -102,7 +113,7 @@ const index = () => {
     SERVICE_DESCRIPTIONS[String(id)] || "Service";
 
   const profileUrl =
-    "https://feminiq.in/service-staffs-details.php?" +
+    "https://femiiniq.in/service-staffs-details.php?" +
     "staff_id=" +
     encodeURIComponent(
       Array.isArray(staffData.id)
@@ -203,13 +214,14 @@ const index = () => {
     }
   }
 
-  const showTick = staffData && tickStaffIds.includes(Number(staffData.id));
+  // Show tick for all solo and parlour staff
+  const showTick = staffData && (staffData.type === "solo" || staffData.type === "parlour");
 
   const tickColor =
     staffData?.type === "solo"
-      ? "#3B82F6"
-      : staffData?.type === "studio"
-        ? "#10B981"
+      ? "#3B82F6" // Blue for Solo
+      : staffData?.type === "parlour"
+        ? "#10B981" // Green for Parlour
         : null;
 
   useEffect(() => {
@@ -449,7 +461,7 @@ const index = () => {
               }}
             >
               <View className="bg-pink-100 rounded-full p-4 flex items-center justify-center mb-1.5">
-                <Ionicons name={icon} size={20} color="#FF5ACC" />
+                <Ionicons name={icon as any} size={20} color="#FF5ACC" />
               </View>
               <Text
                 className={`text-[12px] font-poppins-medium ${isDarkMode ? "text-white" : "text-black"

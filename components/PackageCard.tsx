@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 import { useAuth } from "@/context/UserContext";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface PackageType {
   id: number;
@@ -111,10 +111,31 @@ const PackageCard: React.FC<PackageCardProps> = ({
   return (
     <TouchableOpacity
       onPress={() => {
-        router.push({
-          pathname: "/Details",
-          params: { ...staffData, type: "package" },
-        });
+        if (staffData) {
+          const params: Record<string, string> = {
+            id: String(staffData.id || ''),
+            name: String(staffData.name || ''),
+            address: String(staffData.address || ''),
+            latitude: String(staffData.latitude || ''),
+            longitude: String(staffData.longitude || ''),
+            rating: String(staffData.rating || '0'),
+            distance: String(staffData.distance || '0'),
+            service_id: String(staffData.service_id || ''),
+            image: String(staffData.image || ''),
+            mobile_image_url: String(staffData.mobile_image_url || ''),
+            type: 'package',
+            average_rating: String(staffData.average_rating || staffData.rating || '0'),
+            hourly_rate: String(staffData.hourly_rate || ''),
+            reviews: String(staffData.reviews || '0'),
+            price: String(staffData.price || ''),
+            city: String(staffData.city || ''),
+            backPath: 'explore',
+          };
+          router.push({
+            pathname: "/Details",
+            params: params,
+          });
+        }
       }}
     >
       <View
