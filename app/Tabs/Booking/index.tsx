@@ -66,9 +66,9 @@ interface AlertModal2Props {
 }
 
 const statusMap: { [K in BookingStatus]: string } = {
-  Upcoming: "upcoming",
-  Completed: "completed",
-  Cancelled: "cancelled",
+  Upcoming: "Upcoming",
+  Completed: "Completed",
+  Cancelled: "Cancelled",
 };
 
 /* -------------------------------

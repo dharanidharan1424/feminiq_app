@@ -157,28 +157,54 @@ export default function ReviewSummary() {
         if (bookingDataJson) {
           const parsedData = JSON.parse(bookingDataJson);
 
-          // If staff object is empty but services have staff_id, fetch staff data
-          if ((!parsedData.staff || Object.keys(parsedData.staff).length === 0) &&
-            parsedData.services && parsedData.services.length > 0 &&
-            parsedData.services[0].staff_id) {
+          // If staff object is empty, try to fetch staff data from services or packages
+          if (!parsedData.staff || Object.keys(parsedData.staff).length === 0) {
+            let staffId = null;
+            let staffSource = null; // Track where we got the staff_id from
 
-            const staffId = parsedData.services[0].staff_id;
-            console.log("📋 Staff object is empty, fetching staff data for ID:", staffId);
+            // Try to get staff_id from services
+            if (parsedData.services && parsedData.services.length > 0 && parsedData.services[0].staff_id) {
+              staffId = parsedData.services[0].staff_id;
+              staffSource = parsedData.services[0];
+            }
+            // If not in services, try packages
+            else if (parsedData.packages && parsedData.packages.length > 0 && parsedData.packages[0].staff_id) {
+              staffId = parsedData.packages[0].staff_id;
+              staffSource = parsedData.packages[0];
+            }
 
-            try {
-              const response = await fetch(
-                `https://femiiniq-backend.onrender.com/api/get-staffs/${staffId}`
-              );
-              const json = await response.json();
+            if (staffId) {
+              console.log("📋 Staff object is empty, fetching staff data for ID:", staffId);
 
-              if (json.status === "success" && json.data) {
-                console.log("✅ Fetched staff data:", json.data);
-                parsedData.staff = json.data;
-              } else {
-                console.error("❌ Failed to fetch staff data:", json);
+              try {
+                const response = await fetch(
+                  `https://femiiniq-backend.onrender.com/api/get-staffs/${staffId}`
+                );
+                const json = await response.json();
+
+                if (json.status === "success" && json.data) {
+                  console.log("✅ Fetched staff data:", json.data);
+                  parsedData.staff = json.data;
+                } else {
+                  console.error("❌ Failed to fetch staff data:", json);
+                  // Fallback: create minimal staff object from service data
+                  console.log("⚠️ Using fallback staff data from service");
+                  parsedData.staff = {
+                    id: staffId,
+                    name: staffSource?.staff_name || "Unknown Staff",
+                  };
+                }
+              } catch (error) {
+                console.error("❌ Error fetching staff data:", error);
+                // Fallback: create minimal staff object
+                console.log("⚠️ Using fallback staff data due to error");
+                parsedData.staff = {
+                  id: staffId,
+                  name: staffSource?.staff_name || "Unknown Staff",
+                };
               }
-            } catch (error) {
-              console.error("❌ Error fetching staff data:", error);
+            } else {
+              console.warn("⚠️ No staff_id found in services or packages");
             }
           }
 
@@ -476,6 +502,16 @@ export default function ReviewSummary() {
               time: bookingData.time,
             });
 
+            console.log("👤 User profile info:", {
+              profile_id: profile?.id,
+              profile_email: profile?.email,
+              profile_name: profile?.name
+            });
+
+            // Location column has data type issues, setting to null
+            // Store location info in address field instead
+            const fullAddress = `${bookingData.serviceLocationLabel || ''} - ${bookingData.serviceLocation || ''}`;
+
             const bookingRequest = {
               order_id: orderData.id,
               payment_id: data.razorpay_payment_id,
@@ -485,8 +521,8 @@ export default function ReviewSummary() {
               booking_date: bookingData.date,
               booking_time: convertTimeTo24Hour(String(bookingData.time)),
               staffname: bookingData.staff?.name,
-              address: bookingData.serviceLocation,
-              location: bookingData.serviceLocationLabel,
+              address: fullAddress,
+              location: null, // Set to null to avoid data truncation error
               services: JSON.stringify([
                 ...(bookingData.services?.map((s) => ({
                   name: s.name,
@@ -501,11 +537,11 @@ export default function ReviewSummary() {
                   service_id: p.category_id,
                 })) ?? []),
               ]),
-              category_id: bookingData.services?.[0]?.category_id || null,
-              service_id: bookingData.services?.[0]?.category_id || null,
+              category_id: bookingData.services?.[0]?.category_id || bookingData.packages?.[0]?.category_id || 0,
+              service_id: bookingData.services?.[0]?.category_id || bookingData.packages?.[0]?.category_id || 0,
               image: null,
               status: "upcoming",
-              paid_at: new Date().toISOString(),
+              paid_at: new Date().toISOString().slice(0, 19).replace('T', ' '), // MySQL datetime format
               note: notes || "",
               cancel_reason: null,
               reschedule_date: null,
