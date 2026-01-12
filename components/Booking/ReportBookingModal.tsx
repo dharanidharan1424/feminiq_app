@@ -1,15 +1,14 @@
+import { useAuth } from "@/context/UserContext";
 import React, { useState } from "react";
 import {
-    View,
-    Text,
-    TouchableOpacity,
-    TextInput,
+    Alert,
     Modal,
     Pressable,
-    Alert,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useAuth } from "@/context/UserContext";
 import { Chase } from "react-native-animated-spinkit";
 
 interface ReportBookingModalProps {
@@ -40,7 +39,7 @@ export const ReportBookingModal: React.FC<ReportBookingModalProps> = ({
         }
         setLoading(true);
         try {
-            const res = await fetch("https://feminiq-backend.onrender.com/report", {
+            const res = await fetch("https://femiiniq-backend.onrender.com/report", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

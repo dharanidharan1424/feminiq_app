@@ -164,6 +164,12 @@ export default function NearbyStaffMap() {
   ).current;
 
   const jitter = (val: any) => val + (Math.random() - 0.5) * 0.001;
+
+  // Helper function to consistently parse coordinates
+  const parseCoordinate = (coord: string | number | null | undefined, defaultValue: number): number => {
+    if (coord === null || coord === undefined) return defaultValue;
+    return typeof coord === "string" ? parseFloat(coord) : coord;
+  };
   useEffect(() => {
     (async () => {
       const saved = await AsyncStorage.getItem("recent_searches");
@@ -252,33 +258,93 @@ export default function NearbyStaffMap() {
   // Fetch staffs from API
   const fetchStaffs = useCallback(async () => {
     setIsLoading(true);
+    console.log("🔄 Starting to fetch staffs...");
+
     try {
+      // Add timeout to prevent infinite loading
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout (Render.com cold start can be slow)
+
       const response = await fetch(
-        "https://femiiniq-backend.onrender.com/api/get-staffs"
+        "https://femiiniq-backend.onrender.com/api/get-staffs",
+        { signal: controller.signal }
       );
+
+      clearTimeout(timeoutId);
+
+      console.log("📡 Response status:", response.status);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const json = await response.json();
 
-      // console.log("RAW API RESPONSE:", json);
+      console.log("RAW API RESPONSE:", json);
+      console.log("Response type:", typeof json);
+      console.log("Is array:", Array.isArray(json));
+
+      // Handle both response formats:
+      // 1. {status: "success", data: [...]} - expected format
+      // 2. [...] - direct array format
+      let staffData: Staff[] = [];
 
       if (json.status === "success" && Array.isArray(json.data)) {
-        const patchedStaffs = json.data.map((s: Staff) => ({
-          ...s,
-          latitude:
-            s.latitude !== null
-              ? Number(s.latitude)
-              : 9.9252, // Madurai latitude
-          longitude:
-            s.longitude !== null
-              ? Number(s.longitude)
-              : 78.1198, // Madurai longitude
-        }));
-
-        setStaffs(patchedStaffs);
-        setFilteredStaffs(patchedStaffs);
+        // Expected format with status wrapper
+        staffData = json.data;
+        console.log("✅ Using wrapped format, found", staffData.length, "staffs");
+      } else if (Array.isArray(json)) {
+        // Direct array format
+        staffData = json;
+        console.log("✅ Using direct array format, found", staffData.length, "staffs");
+      } else {
+        console.error("❌ Unexpected API response format:", json);
+        Alert.alert("Error", "Unexpected data format from server");
+        setIsLoading(false);
+        return;
       }
-    } catch (error) {
-      console.error("Failed to fetch staffs", error);
+
+      // Patch staff data with default coordinates if missing
+      const patchedStaffs = staffData.map((s: Staff) => ({
+        ...s,
+        latitude:
+          s.latitude !== null && s.latitude !== undefined
+            ? Number(s.latitude)
+            : 9.9252, // Madurai latitude
+        longitude:
+          s.longitude !== null && s.longitude !== undefined
+            ? Number(s.longitude)
+            : 78.1198, // Madurai longitude
+      }));
+
+      console.log("✅ Processed", patchedStaffs.length, "staffs successfully");
+
+      // Log each staff's coordinates for debugging
+      console.log("\n📍 Staff Coordinates:");
+      patchedStaffs.forEach((s, index) => {
+        if (index < 5) { // Only log first 5 to avoid clutter
+          console.log(`  ${s.id}. ${s.name}: (${s.latitude}, ${s.longitude}) - ${s.address || 'No address'}`);
+        }
+      });
+      if (patchedStaffs.length > 5) {
+        console.log(`  ... and ${patchedStaffs.length - 5} more`);
+      }
+      console.log("");
+
+      setStaffs(patchedStaffs);
+      setFilteredStaffs(patchedStaffs);
+    } catch (error: any) {
+      console.error("❌ Failed to fetch staffs:", error);
+
+      if (error.name === 'AbortError') {
+        console.error("⏱️ Request timed out after 30 seconds");
+        Alert.alert("Timeout", "Server is taking too long to respond. The server might be starting up (cold start). Please wait a moment and try pulling down to refresh.");
+      } else {
+        console.error("🔥 Error details:", error.message);
+        Alert.alert("Error", `Failed to load staff data: ${error.message}`);
+      }
     } finally {
+      console.log("✅ Setting isLoading to false");
       setIsLoading(false);
     }
   }, []);
@@ -561,13 +627,13 @@ export default function NearbyStaffMap() {
   ]);
   // Add this right after the useEffect that filters staffs
   useEffect(() => {
-    console.log("=== Debug Info ===");
-    console.log("Total staffs:", staffs.length);
-    console.log("Filtered staffs:", filteredStaffs.length);
-    console.log("Selected radius:", selectedRadius, "km");
-    console.log("Current location:", currentLocation);
-    console.log("Search location:", searchLocation);
-    console.log("==================");
+    // console.log("=== Debug Info ===");
+    // console.log("Total staffs:", staffs.length);
+    // console.log("Filtered staffs:", filteredStaffs.length);
+    // console.log("Selected radius:", selectedRadius, "km");
+    // console.log("Current location:", currentLocation);
+    // console.log("Search location:", searchLocation);
+    // console.log("==================");
   }, [staffs, filteredStaffs, selectedRadius, currentLocation, searchLocation]);
   const getColor = (light: any, dark: any) => (isDarkMode ? dark : light);
 
@@ -711,62 +777,87 @@ export default function NearbyStaffMap() {
                 </Marker>
               </>
             )}
-            {showRoute && routeStaff && (currentLocation || searchLocation) && (
-              <MapViewDirections
-                origin={{
-                  latitude:
-                    currentLocation?.latitude ?? searchLocation?.latitude ?? 0,
-                  longitude:
-                    currentLocation?.longitude ??
-                    searchLocation?.longitude ??
-                    0,
-                }}
-                destination={{
-                  latitude:
-                    typeof routeStaff.latitude === "string"
-                      ? parseFloat(routeStaff.latitude)
-                      : (routeStaff.latitude ?? 0),
-                  longitude:
-                    typeof routeStaff.longitude === "string"
-                      ? parseFloat(routeStaff.longitude)
-                      : (routeStaff.longitude ?? 0),
-                }}
-                apikey="AIzaSyCZ-OMkJfjg--0GLY91S3az8hVf17kh3S4"
-                strokeWidth={4}
-                strokeColor="#FF5ACC"
-                mode={travelMode.toUpperCase() as "DRIVING" | "WALKING"}
-                onReady={(result) => {
-                  setDistanceLoading(false);
-                  if (
-                    result.coordinates &&
-                    result.legs &&
-                    result.legs.length > 0
-                  ) {
-                    const totalDistanceMeters = result.legs.reduce(
-                      (sum, leg) => sum + (leg.distance?.value ?? 0),
-                      0
-                    );
-                    const totalDurationSeconds = result.legs.reduce(
-                      (sum, leg) => sum + (leg.duration?.value ?? 0),
-                      0
-                    );
-                    const distanceKm = totalDistanceMeters / 1000;
-                    const durationMin = totalDurationSeconds / 60;
-                    setDistanceText(distanceKm.toFixed(1) + " km");
-                    setDurationText(durationMin.toFixed(0) + " mins");
-                  }
-                  mapRef.current?.fitToCoordinates(result.coordinates, {
-                    edgePadding: { top: 50, bottom: 50, left: 50, right: 50 },
-                    animated: true,
-                  });
-                }}
-                onStart={() => setDistanceLoading(true)}
-                onError={(errorMessage) => {
-                  setDistanceLoading(false);
-                  console.error("Directions error:", errorMessage);
-                }}
-              />
-            )}
+            {showRoute && routeStaff && (currentLocation || searchLocation) && (() => {
+              // Parse coordinates cleanly for navigation
+              const originLat = parseCoordinate(
+                currentLocation?.latitude ?? searchLocation?.latitude,
+                0
+              );
+              const originLng = parseCoordinate(
+                currentLocation?.longitude ?? searchLocation?.longitude,
+                0
+              );
+              const destLat = parseCoordinate(routeStaff.latitude, 0);
+              const destLng = parseCoordinate(routeStaff.longitude, 0);
+
+              // Debug logging
+              console.log("🗺️ MapViewDirections - Origin:", {
+                lat: originLat,
+                lng: originLng,
+                source: currentLocation ? "currentLocation" : "searchLocation"
+              });
+              console.log("🗺️ MapViewDirections - Destination:", {
+                lat: destLat,
+                lng: destLng,
+                name: routeStaff.name,
+                address: routeStaff.address
+              });
+
+              return (
+                <MapViewDirections
+                  origin={{
+                    latitude: originLat,
+                    longitude: originLng,
+                  }}
+                  destination={{
+                    latitude: destLat,
+                    longitude: destLng,
+                  }}
+                  apikey="AIzaSyATvj7dRnHQXC3f5fb41s8rTo50pUd8cB4"
+                  strokeWidth={4}
+                  strokeColor="#FF5ACC"
+                  mode={travelMode.toUpperCase() as "DRIVING" | "WALKING"}
+                  onReady={(result) => {
+                    setDistanceLoading(false);
+                    if (
+                      result.coordinates &&
+                      result.legs &&
+                      result.legs.length > 0
+                    ) {
+                      const totalDistanceMeters = result.legs.reduce(
+                        (sum, leg) => sum + (leg.distance?.value ?? 0),
+                        0
+                      );
+                      const totalDurationSeconds = result.legs.reduce(
+                        (sum, leg) => sum + (leg.duration?.value ?? 0),
+                        0
+                      );
+                      const distanceKm = totalDistanceMeters / 1000;
+                      const durationMin = totalDurationSeconds / 60;
+                      setDistanceText(distanceKm.toFixed(1) + " km");
+                      setDurationText(durationMin.toFixed(0) + " mins");
+                      console.log("✅ Route calculated:", {
+                        distance: distanceKm.toFixed(1) + " km",
+                        duration: durationMin.toFixed(0) + " mins"
+                      });
+                    }
+                    mapRef.current?.fitToCoordinates(result.coordinates, {
+                      edgePadding: { top: 50, bottom: 50, left: 50, right: 50 },
+                      animated: true,
+                    });
+                  }}
+                  onStart={() => {
+                    setDistanceLoading(true);
+                    console.log("🔄 Calculating route...");
+                  }}
+                  onError={(errorMessage) => {
+                    setDistanceLoading(false);
+                    console.error("❌ Directions error:", errorMessage);
+                    Alert.alert("Navigation Error", "Failed to calculate route. Please try again.");
+                  }}
+                />
+              );
+            })()}
             {filteredStaffs.map(
               (staff) =>
                 staff.latitude != null &&
@@ -1313,9 +1404,25 @@ export default function NearbyStaffMap() {
                   className="flex-row items-center gap-2 bg-[#28a745]/30 border border-[#28a745] rounded-full px-4 py-2 mt-2"
                   onPress={() => {
                     if (routeStaff && currentLocation) {
-                      const url = `https://www.google.com/maps/dir/?api=1&origin=${currentLocation.latitude},${currentLocation.longitude}&destination=${routeStaff.latitude},${routeStaff.longitude}&travelmode=${travelMode.toLowerCase()}`;
+                      // Use addresses instead of coordinates for Google Maps
+                      // Use current location coordinates as origin (user's current position)
+                      const originAddress = `${currentLocation.latitude},${currentLocation.longitude}`;
+                      const destinationAddress = routeStaff.address || `${routeStaff.latitude},${routeStaff.longitude}`;
+
+                      // Encode addresses for URL
+                      const encodedOrigin = encodeURIComponent(originAddress);
+                      const encodedDestination = encodeURIComponent(destinationAddress);
+
+                      const url = `https://www.google.com/maps/dir/?api=1&origin=${encodedOrigin}&destination=${encodedDestination}&travelmode=${travelMode.toLowerCase()}`;
+
+                      console.log("🧭 Opening Google Maps:", {
+                        origin: originAddress,
+                        destination: destinationAddress,
+                        mode: travelMode.toLowerCase()
+                      });
+
                       Linking.openURL(url).catch((err) =>
-                        console.error("An error occurred", err)
+                        console.error("❌ Failed to open Google Maps:", err)
                       );
                     }
                   }}
@@ -1494,7 +1601,7 @@ export default function NearbyStaffMap() {
                     }}
                   >
                     <Image
-                      source={{ uri: selectedStaff?.mobile_image_url }}
+                      source={{ uri: selectedStaff?.mobile_image_url || selectedStaff?.image }}
                       style={{ width: 100, height: 100, borderRadius: 50 }}
                     />
                     <Text
@@ -1508,6 +1615,14 @@ export default function NearbyStaffMap() {
                       style={
                         isDarkMode ? { color: "#FF5ACC" } : { color: "#FF5ACC" }
                       }
+                      onLayout={() => {
+                        console.log("📍 Selected Staff:", {
+                          name: selectedStaff?.name,
+                          address: selectedStaff?.address,
+                          lat: selectedStaff?.latitude,
+                          lng: selectedStaff?.longitude
+                        });
+                      }}
                     >
                       {selectedStaff?.address}
                     </Text>

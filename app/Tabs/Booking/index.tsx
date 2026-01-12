@@ -988,11 +988,28 @@ export default function BookingPage() {
 
                 const data = await response.json();
                 const staffData = data.data;
-                // Navigate after fetching details
+
+                // Explicitly convert all properties to strings for navigation
                 router.push({
-                  pathname: "/Details", // fix capitalization: pathname is all lowercase
-                  params: { ...staffData, backPath: "booking" }, // pass data if you want, or just use staffId
+                  pathname: "/Details",
+                  params: {
+                    id: String(staffData.id || ''),
+                    name: String(staffData.name || ''),
+                    email: String(staffData.email || ''),
+                    mobile: String(staffData.mobile || ''),
+                    image: String(staffData.image || ''),
+                    mobile_image_url: String(staffData.mobile_image_url || ''),
+                    gender: String(staffData.gender || ''),
+                    address: String(staffData.address || ''),
+                    latitude: String(staffData.latitude || ''),
+                    longitude: String(staffData.longitude || ''),
+                    rating: String(staffData.rating || ''),
+                    reviews_count: String(staffData.reviews_count || ''),
+                    service_id: String(staffData.service_id || ''),
+                    backPath: "booking",
+                  },
                 });
+
                 return staffData;
               } catch (error) {
                 console.error("Error fetching staff details:", error);

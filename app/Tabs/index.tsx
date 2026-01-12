@@ -352,7 +352,7 @@ const Index = () => {
             // Ensure you have user profile and token
             try {
               const response = await fetch(
-                "https://femiiniq-backend.onrender.com/api/login/savePushToken",
+                "https://femiiniq-backend.onrender.com/login/savePushToken",
                 {
                   method: "POST",
                   headers: {
@@ -524,7 +524,7 @@ const Index = () => {
                   renderItem={({ item }) => (
                     <ProfileCard
                       data={item}
-                      avatar={{ uri: item.mobile_image_url }}
+                      avatar={{ uri: item.mobile_image_url || item.image }}
                       name={item.name}
                       address={item.address || item.location}
                       distance={

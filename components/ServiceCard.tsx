@@ -74,7 +74,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
     async function fetchStaff() {
       try {
         const res = await fetch(
-          `https://feminiq-backend.onrender.com/api/get-staffs/${service.staff_id}`
+          `https://femiiniq-backend.onrender.com/api/get-staffs/${service.staff_id}`
         );
         if (res.ok) {
           const json = await res.json();
@@ -250,8 +250,8 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
             <TouchableOpacity
               onPress={addToCart}
               className={`px-3 py-1 rounded-full border flex-row items-center ${isInCart
-                  ? "bg-green-100 border-green-500"
-                  : "bg-pink-100 border-primary"
+                ? "bg-green-100 border-green-500"
+                : "bg-pink-100 border-primary"
                 }`}
             >
               <MaterialCommunityIcons

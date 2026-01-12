@@ -94,7 +94,7 @@ const NearbyLocation: React.FC = () => {
         );
         const json = await response.json();
         if (json.status === "success" && Array.isArray(json.data)) {
-          console.log("Staff types from API:", json.data.map((s: any) => ({ id: s.id, name: s.name, type: s.type })));
+          // console.log("Staff types from API:", json.data.map((s: any) => ({ id: s.id, name: s.name, type: s.type })));
           setStaffs(json.data);
         } else {
           setStaffs([]);
@@ -467,7 +467,7 @@ const NearbyLocation: React.FC = () => {
               renderItem={({ item }) => (
                 <ProfileCard
                   data={item}
-                  avatar={{ uri: item.mobile_image_url }}
+                  avatar={{ uri: item.mobile_image_url || item.image }}
                   name={item.name}
                   address={item.address}
                   distance={

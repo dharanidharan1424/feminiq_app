@@ -45,7 +45,7 @@ const PackageCard: React.FC<PackageCardProps> = ({
     async function fetchStaff() {
       try {
         const res = await fetch(
-          `https://feminiq-backend.onrender.com/api/get-staffs/${packageItem.staff_id}`
+          `https://femiiniq-backend.onrender.com/api/get-staffs/${packageItem.staff_id}`
         );
         if (res.ok) {
           const json = await res.json();

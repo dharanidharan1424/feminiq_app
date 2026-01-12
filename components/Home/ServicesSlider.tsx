@@ -26,7 +26,7 @@ const ServicesSlider: React.FC = () => {
   const { width } = useWindowDimensions();
 
   useEffect(() => {
-    fetch("https://feminiq-backend.onrender.com/api/service-categories")
+    fetch("https://femiiniq-backend.onrender.com/api/service-categories")
       .then((res) => res.json())
       .then((json) => {
         setServices(json.categories || []);

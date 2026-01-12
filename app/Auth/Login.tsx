@@ -4,7 +4,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 
-import FacebookLogin from "@/components/Auth/FacebookLogin";
 import GoogleLogin from "@/components/Auth/GoogleLogin";
 import {
   Alert,
@@ -295,13 +294,13 @@ const Login = () => {
             marginTop: 20,
           }}
         >
-          <FacebookLogin
+          {/* <FacebookLogin
             onLoginSuccess={handleLoginSuccess}
             onLoginFailure={handleLoginFailure}
             images={images}
             isDarkMode={isDarkMode}
             size="small"
-          />
+          /> */}
 
           <GoogleLogin
             onLoginSuccess={handleLoginSuccess}

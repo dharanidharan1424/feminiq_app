@@ -12,7 +12,7 @@ const NotificationBadge: React.FC<Props> = ({ userId, isDarkMode }) => {
   useEffect(() => {
     if (!userId) return;
     fetch(
-      `https://feminiq-backend.onrender.com/notification/unread-count/${userId}`
+      `https://femiiniq-backend.onrender.com/notification/unread-count/${userId}`
     )
       .then((res) => res.json())
       .then((data) => {

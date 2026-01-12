@@ -1,18 +1,18 @@
+import { useAuth } from "@/context/UserContext";
+import { Ionicons } from "@expo/vector-icons";
+import * as FileSystem from "expo-file-system/legacy";
+
+import { router, useLocalSearchParams } from "expo-router";
+import * as Sharing from "expo-sharing";
 import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
   Alert,
   Modal,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { router, useLocalSearchParams } from "expo-router";
-import { useAuth } from "@/context/UserContext";
-import * as FileSystem from "expo-file-system";
-import * as MediaLibrary from "expo-media-library";
-import * as Sharing from "expo-sharing";
 import { Wave } from "react-native-animated-spinkit";
 
 // Types for safe state/DB structure
@@ -145,8 +145,8 @@ export default function ReceiptPage() {
 
   const platformFee = booking
     ? Math.round(
-        (booking.total_price - couponAmount) * (platformFeePercent / 100)
-      )
+      (booking.total_price - couponAmount) * (platformFeePercent / 100)
+    )
     : 0;
 
   const finalAmount = booking
@@ -159,7 +159,7 @@ export default function ReceiptPage() {
         const bookingCode = (params as { bookingCode?: string })?.bookingCode;
         if (!bookingCode) return;
         const response = await fetch(
-          `https://feminiq-backend.onrender.com/booking/${bookingCode}`
+          `https://femiiniq-backend.onrender.com/booking/${bookingCode}`
         );
         const resJson = await response.json();
         if (resJson.status === "success") {
@@ -209,32 +209,33 @@ export default function ReceiptPage() {
       if (!booking) return;
       setDownloading(true);
 
-      const receiptUrl = `https://feminiq-backend.onrender.com/receipt/${booking.receipt_id}`;
-      const fileUri = FileSystem.cacheDirectory + `${booking.receipt_id}.pdf`;
+      const receiptUrl = `https://femiiniq-backend.onrender.com/receipt/${booking.receipt_id}`;
+      const fileName = `receipt_${booking.receipt_id}_${Date.now()}.pdf`;
+      const fileUri = FileSystem.documentDirectory + fileName;
 
-      // Download PDF to cache directory
+      // Download PDF to document directory
       const { uri } = await FileSystem.downloadAsync(receiptUrl, fileUri);
 
-      // Request permission to access media library
-      const { status } = await MediaLibrary.requestPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert("Permission denied", "Cannot save file without permission");
-        return;
-      }
+      console.log('PDF downloaded to:', uri);
 
-      // Save downloaded file to media library (Downloads album)
-      const asset = await MediaLibrary.createAssetAsync(uri);
-      const album = await MediaLibrary.getAlbumAsync("Download");
-      if (album == null) {
-        await MediaLibrary.createAlbumAsync("Download", asset, false);
+      // Use Sharing API to let user save/share the file
+      const canShare = await Sharing.isAvailableAsync();
+      if (canShare) {
+        await Sharing.shareAsync(uri, {
+          mimeType: 'application/pdf',
+          dialogTitle: 'Save or Share Receipt',
+          UTI: 'com.adobe.pdf'
+        });
+        setDownloadedUri(uri);
+        setModalVisible(true);
       } else {
-        await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
+        Alert.alert('Success', 'Receipt downloaded to app storage');
+        setDownloadedUri(uri);
+        setModalVisible(true);
       }
-      setDownloadedUri(uri);
-      setModalVisible(true);
     } catch (error) {
-      console.error(error);
-      Alert.alert("Error", "Failed to save or open receipt");
+      console.error('Download error:', error);
+      Alert.alert("Error", "Failed to download receipt. Please try again.");
     } finally {
       setDownloading(false);
     }

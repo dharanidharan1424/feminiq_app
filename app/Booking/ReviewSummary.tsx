@@ -128,7 +128,7 @@ export default function ReviewSummary() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAlertVisible, setAlertVisible] = useState<boolean>(false);
   const [bookingCode, setBookingCode] = useState<string>("");
-  const [notes, setNotes] = useState<string>(String(bookingData?.notes) || "");
+  const [notes, setNotes] = useState<string>("");
   const [editing, setEditing] = useState(false);
   const [couponCode, setCouponCode] = useState<string>(
     bookingData?.couponCode || ""
@@ -155,7 +155,34 @@ export default function ReviewSummary() {
           `${STORAGE_PREFIX}${token}`
         );
         if (bookingDataJson) {
-          setBookingData(JSON.parse(bookingDataJson));
+          const parsedData = JSON.parse(bookingDataJson);
+
+          // If staff object is empty but services have staff_id, fetch staff data
+          if ((!parsedData.staff || Object.keys(parsedData.staff).length === 0) &&
+            parsedData.services && parsedData.services.length > 0 &&
+            parsedData.services[0].staff_id) {
+
+            const staffId = parsedData.services[0].staff_id;
+            console.log("📋 Staff object is empty, fetching staff data for ID:", staffId);
+
+            try {
+              const response = await fetch(
+                `https://femiiniq-backend.onrender.com/api/get-staffs/${staffId}`
+              );
+              const json = await response.json();
+
+              if (json.status === "success" && json.data) {
+                console.log("✅ Fetched staff data:", json.data);
+                parsedData.staff = json.data;
+              } else {
+                console.error("❌ Failed to fetch staff data:", json);
+              }
+            } catch (error) {
+              console.error("❌ Error fetching staff data:", error);
+            }
+          }
+
+          setBookingData(parsedData);
         }
       } catch (error) {
         setBookingData(null);
@@ -418,98 +445,145 @@ export default function ReviewSummary() {
 
       RazorpayCheckout.open(razorpayOptions)
         .then(async (data: any) => {
-          // Step 3: Verify payment via backend API
-          const verifyResponse = await fetch(
-            "https://femiiniq-backend.onrender.com/payments/verify-payment",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                razorpay_order_id: data.razorpay_order_id,
-                razorpay_payment_id: data.razorpay_payment_id,
-                razorpay_signature: data.razorpay_signature,
-              }),
+          try {
+            // Step 3: Verify payment via backend API
+            const verifyResponse = await fetch(
+              "https://femiiniq-backend.onrender.com/payments/verify-payment",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  razorpay_order_id: data.razorpay_order_id,
+                  razorpay_payment_id: data.razorpay_payment_id,
+                  razorpay_signature: data.razorpay_signature,
+                }),
+              }
+            );
+
+            const verifyData = await verifyResponse.json();
+
+            if (!verifyData.success) {
+              throw new Error("Payment verification failed");
             }
-          );
 
-          const verifyData = await verifyResponse.json();
+            // Step 4: Create booking with payment ID
+            console.log("🔍 Debug - bookingData:", {
+              staff_id: bookingData.staff?.id,
+              staff_name: bookingData.staff?.name,
+              serviceLocation: bookingData.serviceLocation,
+              serviceLocationLabel: bookingData.serviceLocationLabel,
+              date: bookingData.date,
+              time: bookingData.time,
+            });
 
-          if (!verifyData.success) {
-            throw new Error("Payment verification failed");
+            const bookingRequest = {
+              order_id: orderData.id,
+              payment_id: data.razorpay_payment_id,
+              user_id: profile?.id,
+              agent_id: String(bookingData.staff?.id),
+              agent_name: bookingData.staff?.name,
+              booking_date: bookingData.date,
+              booking_time: convertTimeTo24Hour(String(bookingData.time)),
+              staffname: bookingData.staff?.name,
+              address: bookingData.serviceLocation,
+              location: bookingData.serviceLocationLabel,
+              services: JSON.stringify([
+                ...(bookingData.services?.map((s) => ({
+                  name: s.name,
+                  price: s.price,
+                  quantity: s.quantity,
+                  service_id: s.category_id,
+                })) ?? []),
+                ...(bookingData.packages?.map((p) => ({
+                  name: p.name,
+                  price: p.price,
+                  quantity: p.quantity,
+                  service_id: p.category_id,
+                })) ?? []),
+              ]),
+              category_id: bookingData.services?.[0]?.category_id || null,
+              service_id: bookingData.services?.[0]?.category_id || null,
+              image: null,
+              status: "upcoming",
+              paid_at: new Date().toISOString(),
+              note: notes || "",
+              cancel_reason: null,
+              reschedule_date: null,
+              reschedule_reason: null,
+              reschedule_status: null,
+              discountprice: couponValid ? appliedDiscount : 0,
+              coupon_discount: couponValid ? appliedDiscount : 0,
+              platformfee: platformFee,
+              totalprice: finalAmount,
+              finalprice: finalAmount,
+              payment_method: bookingData?.paymentMethod ?? "razorpay",
+              payment_type: "online",
+              amount: finalAmount,
+              personal_note: notes || "",
+              booking_status: "confirmed",
+              couponcode: couponValid ? couponCode : null,
+              artist_platform_fee: 0,
+              start_otp: null,
+              complete_otp: null,
+              is_started: 0,
+              is_completed: 0,
+              remaining_amount: 0,
+              payment_status: "paid",
+              paid_amount: finalAmount,
+            };
+
+
+            console.log("📤 Sending booking request:", bookingRequest);
+
+            const response = await fetch(
+              "https://femiiniq-backend.onrender.com/booking",
+              {
+                method: "POST",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(bookingRequest),
+              }
+            );
+
+            console.log("📥 Booking API response status:", response.status);
+
+            if (!response.ok) {
+              const errorText = await response.text();
+              console.error("❌ Booking API error response:", errorText);
+              throw new Error(
+                `Booking creation failed with status ${response.status}: ${errorText}`
+              );
+            }
+
+            const responseData = await response.json();
+            console.log("✅ Booking created successfully:", responseData);
+
+            await removeBookedItemsFromCart(
+              token!,
+              bookingData.staff?.id!,
+              bookingData.services || [],
+              bookingData.packages || []
+            );
+
+            await AsyncStorage.removeItem(`booking_details_${token}`);
+            await AsyncStorage.removeItem(`pkg_appointment_details_${token}`);
+            await AsyncStorage.removeItem(`cart_appointment_details_${token}`);
+
+            setIsLoading(false);
+            setAlertVisible(true);
+          } catch (bookingError: any) {
+            setIsLoading(false);
+            console.error("❌ Booking creation error:", bookingError);
+            alert(
+              bookingError.message ||
+              "Payment successful but booking creation failed. Please contact support."
+            );
           }
-
-          // Step 4: Create booking with payment ID
-          const bookingRequest = {
-            staff_id: String(bookingData.staff?.id),
-            staff_name: bookingData.staff?.name,
-            service_at: bookingData.serviceLocationLabel,
-            address: bookingData.serviceLocation,
-            user_id: profile?.id,
-            user_name: profile?.fullname,
-            user_email: profile?.email,
-            user_mobile: profile?.mobile,
-            date: bookingData.date,
-            time: convertTimeTo24Hour(String(bookingData.time)),
-            specialist:
-              bookingData.specialist?.map((s: { name: any }) => ({
-                name: s.name,
-              })) ?? [],
-            booked_services:
-              bookingData.services?.map((pkg) => ({
-                name: pkg.name,
-                price: pkg.price,
-                quantity: pkg.quantity,
-                service_id: pkg.category_id,
-              })) ?? [],
-            booked_packages:
-              bookingData.packages?.map((pkg) => ({
-                name: pkg.name,
-                price: pkg.price,
-                quantity: pkg.quantity,
-                service_id: pkg.category_id,
-              })) ?? [],
-            payment_id: data.razorpay_payment_id,
-            payment_method: bookingData?.paymentMethod ?? "unknown",
-            total_price: finalAmount,
-            notes: notes || "",
-            coupon_code: couponValid ? couponCode : null,
-          };
-
-          const response = await fetch(
-            "https://femiiniq-backend.onrender.com/booking",
-            {
-              method: "POST",
-              credentials: "include",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(bookingRequest),
-            }
-          );
-
-          if (!response.ok)
-            throw new Error(`Server returned status ${response.status}`);
-
-          const responseData = await response.json();
-          setBookingCode(responseData.booking_code);
-
-          await removeBookedItemsFromCart(
-            token!,
-            bookingData.staff?.id!,
-            bookingData.services || [],
-            bookingData.packages || []
-          );
-
-          await AsyncStorage.removeItem(`booking_details_${token}`);
-          await AsyncStorage.removeItem(`pkg_appointment_details_${token}`);
-          await AsyncStorage.removeItem(`cart_appointment_details_${token}`);
-
-          setIsLoading(false);
-          setAlertVisible(true);
-          console.log("Booking created:", bookingRequest);
         })
         .catch((error: any) => {
           setIsLoading(false);
+          console.error("❌ Payment error:", error);
           alert(error.description || "Payment failed");
-          console.log("Payment error:", error);
         });
     } catch (error: any) {
       setIsLoading(false);

@@ -1,11 +1,11 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 
-import React, { useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View, Modal } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import CustomInput from "@/components/CustomInput";
-import { useAuth } from "../../context/UserContext";
+import { Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
+import { Modal, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { Chase } from "react-native-animated-spinkit"; // or your spinner
+import { useAuth } from "../../context/UserContext";
 
 const NewPassword = () => {
   const router = useRouter();
@@ -60,7 +60,7 @@ const NewPassword = () => {
 
     try {
       const res = await fetch(
-        "https://feminiq-backend.onrender.com/pass/reset-password",
+        "https://femiiniq-backend.onrender.com/pass/reset-password",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

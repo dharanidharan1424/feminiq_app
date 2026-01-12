@@ -109,7 +109,7 @@ const OtpScreen: React.FC<OtpScreenProps> = ({
     showModal("Verifying", "Verifying your OTP...", true);
     try {
       const res = await fetch(
-        "https://feminiq-backend.onrender.com/otp/verify-otp",
+        "https://femiiniq-backend.onrender.com/otp/verify-otp",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

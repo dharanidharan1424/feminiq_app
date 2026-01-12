@@ -1,4 +1,4 @@
-import FacebookLogin from "@/components/Auth/FacebookLogin";
+// import FacebookLogin from "@/components/Auth/FacebookLogin";
 import GoogleLogin from "@/components/Auth/GoogleLogin";
 import CustomInput from "@/components/CustomInput";
 import { images } from "@/constants";
@@ -629,13 +629,13 @@ const SignUp = () => {
           marginTop: 10,
         }}
       >
-        <FacebookLogin
+        {/* <FacebookLogin
           onLoginSuccess={handleLoginSuccess}
           onLoginFailure={handleLoginFailure}
           images={images}
           isDarkMode={isDarkMode}
           size="small"
-        />
+        /> */}
 
         <GoogleLogin
           onLoginSuccess={handleLoginSuccess}

@@ -77,42 +77,100 @@ const Update: React.FC = () => {
     imageUri: any,
     fileName = "avatar_yourUserId"
   ) => {
-    const data: any = new FormData();
-    data.append("file", {
-      uri: imageUri,
-      type: "image/jpeg", // or get the type dynamically
-      name: `${fileName}.jpg`,
-    });
-    data.append("upload_preset", "Profile_image upload");
-    data.append("folder", "feminiq/UserProfiles"); // 👈 this actually makes the folder
-    data.append("public_id", fileName);
+    try {
+      const data: any = new FormData();
+      data.append("file", {
+        uri: imageUri,
+        type: "image/jpeg", // or get the type dynamically
+        name: `${fileName}.jpg`,
+      });
+      data.append("upload_preset", "Profile_image upload");
+      data.append("folder", "feminiq/UserProfiles"); // 👈 this actually makes the folder
+      data.append("public_id", fileName);
 
-    const res = await fetch(
-      "https://api.cloudinary.com/v1_1/dv9s7sm0x/image/upload",
-      {
-        method: "POST",
-        body: data,
+      const res = await fetch(
+        "https://api.cloudinary.com/v1_1/dv9s7sm0x/image/upload",
+        {
+          method: "POST",
+          body: data,
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error(`Cloudinary upload failed with status ${res.status}`);
       }
-    );
 
-    const cloudinaryData = await res.json();
-    return cloudinaryData;
+      const cloudinaryData = await res.json();
+
+      if (!cloudinaryData.secure_url) {
+        throw new Error("No secure_url in Cloudinary response");
+      }
+
+      return cloudinaryData;
+    } catch (error) {
+      console.error("Cloudinary upload error:", error);
+      throw error;
+    }
   };
 
   const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
+    try {
+      // Request permission first
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-    if (!result.canceled && result.assets && result.assets.length > 0) {
-      const localUri = result.assets[0].uri;
-      const fileName =
-        profile?.fullname?.replace(/\s+/g, "_") || "default_avatar";
-      const cloudinaryResult = await uploadToCloudinary(localUri, fileName);
-      setAvatar(cloudinaryResult.secure_url);
+      if (!permissionResult.granted) {
+        Alert.alert(
+          "Permission Required",
+          "Please allow access to your photo library to update your profile picture."
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: 'images',
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+
+      console.log("Image picker result:", result);
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const localUri = result.assets[0].uri;
+        console.log("Selected image URI:", localUri);
+
+        // Show loading state
+        showModal("Uploading Image", "Please wait...", true);
+
+        const baseFileName =
+          profile?.fullname?.replace(/\s+/g, "_") || "default_avatar";
+        const fileName = `${baseFileName}_${Date.now()}`;
+
+        console.log("Uploading to Cloudinary with filename:", fileName);
+        const cloudinaryResult = await uploadToCloudinary(localUri, fileName);
+
+        console.log("Cloudinary upload result:", cloudinaryResult);
+
+        if (cloudinaryResult.secure_url) {
+          setAvatar(cloudinaryResult.secure_url);
+          console.log("Avatar updated to:", cloudinaryResult.secure_url);
+          setLoading(false);
+          hideModal();
+          Alert.alert("Success", "Profile picture updated! Don't forget to save your changes.");
+        } else {
+          throw new Error("Failed to get secure URL from Cloudinary");
+        }
+      } else {
+        console.log("Image selection was canceled");
+      }
+    } catch (error) {
+      console.error("Error in pickImage:", error);
+      setLoading(false);
+      hideModal();
+      Alert.alert(
+        "Upload Failed",
+        "Failed to upload image. Please try again."
+      );
     }
   };
 
@@ -121,10 +179,35 @@ const Update: React.FC = () => {
     if (selectedDate) setDob(selectedDate);
   };
 
-  const handleContinue = async () => {
+  // Validation helper functions
+  const calculateAge = (birthDate: Date): number => {
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  const isValidEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const isTodaysDate = (date: Date): boolean => {
+    const today = new Date();
+    return (
+      date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear()
+    );
+  };
+
+  const handleContinue = async (): Promise<boolean> => {
     if (!profile?.id) {
       Alert.alert("Error", "User ID not found. Please login again.");
-      return;
+      return false;
     }
 
     if (!token) {
@@ -132,7 +215,38 @@ const Update: React.FC = () => {
         "Error",
         "Authentication token not found. Please login again."
       );
-      return;
+      return false;
+    }
+
+    // Validate Date of Birth
+    if (dob) {
+      if (isTodaysDate(dob)) {
+        Alert.alert("Invalid Date of Birth", "Date of Birth cannot be today's date.");
+        return false;
+      }
+
+      const age = calculateAge(dob);
+      if (age < 18) {
+        Alert.alert("Age Restriction", "You must be at least 18 years old to use this service.");
+        return false;
+      }
+    }
+
+    // Validate Email
+    if (email && email.trim() !== "") {
+      if (!isValidEmail(email)) {
+        Alert.alert("Invalid Email", "Please enter a valid email address.");
+        return false;
+      }
+    }
+
+    // Validate Phone Number
+    if (phone && phone.trim() !== "") {
+      const phoneDigits = phone.replace(/\D/g, ''); // Remove non-digit characters
+      if (phoneDigits.length !== 10) {
+        Alert.alert("Invalid Phone Number", "Phone number must be exactly 10 digits.");
+        return false;
+      }
     }
 
     const newProfile = {
@@ -150,12 +264,14 @@ const Update: React.FC = () => {
 
     try {
       showModal("Updating Profile", "", true);
+      console.log("TOKEN SENT:", token);
+
       setIsLoading(true);
       const response = await fetch(
         "https://femiiniq-backend.onrender.com/api/update-profile/",
         {
           method: "POST",
-          credentials: "include",
+          // credentials: "include",
           headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`,
@@ -173,12 +289,15 @@ const Update: React.FC = () => {
       if (json.status === "success" && json.profile) {
         await updateProfile(json.profile);
         showModal("Success", "Your profile information was updated.", false);
+        return true;
       } else {
         showModal("Error", json.message || "Failed to update profile.", false);
+        return false;
       }
     } catch (error) {
       console.error("Update profile error:", error);
       showModal("Error", "Network error, please try again.", false);
+      return false;
     } finally {
       setIsLoading(false);
     }
@@ -370,6 +489,7 @@ const Update: React.FC = () => {
                   borderRadius: 48,
                   backgroundColor: "#ccc",
                 }}
+                key={avatar}
               />
             ) : (
               <View
@@ -448,7 +568,7 @@ const Update: React.FC = () => {
               <DateTimePicker
                 value={dob || new Date()}
                 mode="date"
-                maximumDate={new Date()}
+                maximumDate={new Date(new Date().setFullYear(new Date().getFullYear() - 18))}
                 display="spinner"
                 onChange={onChangeDob}
                 themeVariant={isDarkMode ? "dark" : "light"}
@@ -468,7 +588,13 @@ const Update: React.FC = () => {
             <CustomInput
               placeholder="Phone Number"
               value={phone}
-              onChangeText={setPhone}
+              onChangeText={(txt) => {
+                // Only allow numbers, max 10 digits
+                const digitsOnly = txt.replace(/\D/g, '');
+                if (digitsOnly.length <= 10) {
+                  setPhone(digitsOnly);
+                }
+              }}
               keyboardType="phone-pad"
               leftIconName="call"
               isDarkMode={isDarkMode}
@@ -552,11 +678,14 @@ const Update: React.FC = () => {
               paddingHorizontal: 32,
               width: "100%",
             }}
-            onPress={() => {
+            onPress={async () => {
               if (isEditing) {
                 // Currently in edit mode, so save changes
-                handleContinue();
-                setIsEditing(false);
+                const success = await handleContinue();
+                // Only exit edit mode if validation passed and save was successful
+                if (success) {
+                  setIsEditing(false);
+                }
               } else {
                 // Not editing, switch to editing mode
                 setIsEditing(true);

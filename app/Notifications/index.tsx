@@ -1,4 +1,7 @@
-import React, { useEffect, useState, useMemo } from "react";
+import { useAuth } from "@/context/UserContext";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   FlatList,
   SafeAreaView,
@@ -7,9 +10,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useAuth } from "@/context/UserContext";
-import { router } from "expo-router";
 import { Chase } from "react-native-animated-spinkit";
 
 // Notification type description
@@ -139,7 +139,7 @@ const NotificationHistory = () => {
   useEffect(() => {
     // Only trigger when notifications are fetched and user is known
     if (profile?.id && notifications.length > 0) {
-      fetch("https://feminiq-backend.onrender.com/notification/mark-all-read", {
+      fetch("https://femiiniq-backend.onrender.com/notification/mark-all-read", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: profile.id }),
@@ -157,7 +157,7 @@ const NotificationHistory = () => {
   useEffect(() => {
     if (!profile?.id) return;
     setLoading(true);
-    fetch(`https://feminiq-backend.onrender.com/notification/${profile.id}`)
+    fetch(`https://femiiniq-backend.onrender.com/notification/${profile.id}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.status === "success") {
@@ -242,11 +242,10 @@ const NotificationHistory = () => {
             <TouchableOpacity
               key={tab.key}
               onPress={() => setFilter(tab.key)}
-              className={`px-4 py-2 mx-2 rounded-full border ${
-                filter === tab.key
+              className={`px-4 py-2 mx-2 rounded-full border ${filter === tab.key
                   ? "bg-pink-400 border-pink-400"
                   : "border-pink-400"
-              }`}
+                }`}
             >
               <Text
                 className={`font-poppins-semibold ${filter === tab.key ? "text-white" : "text-pink-400"}`}

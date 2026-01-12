@@ -165,11 +165,11 @@ const Faq = () => {
         <Text style={[styles.contactLabel, { color: answerTextColor }]}>
           Email:{" "}
           <Text style={styles.contactEmail}>
-            feminiqcustomersupport@Feminiq.com
+            support@feminiq.in
           </Text>
         </Text>
         <Text style={[styles.contactLabel, { color: answerTextColor }]}>
-          Ph No: 98123 00001
+          Ph No: +91 9600579857
         </Text>
       </View>
     </ScrollView>

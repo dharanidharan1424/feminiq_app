@@ -113,7 +113,7 @@ const index = () => {
     SERVICE_DESCRIPTIONS[String(id)] || "Service";
 
   const profileUrl =
-    "https://femiiniq.in/service-staffs-details.php?" +
+    "https://feminiq.in/service-staffs-details.php?" +
     "staff_id=" +
     encodeURIComponent(
       Array.isArray(staffData.id)

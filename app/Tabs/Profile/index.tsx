@@ -316,18 +316,7 @@ const ProfileScreen: React.FC = () => {
                         }
                         isDarkMode={isDarkMode}
                     />
-                    <ProfileMenu
-                        icon={
-                            <MaterialIcons
-                                name="cancel"
-                                size={18}
-                                color={isDarkMode ? "#fff" : "#222"}
-                            />
-                        }
-                        text="Cancellation"
-                        onPress={() => router.push("/Tabs/Profile/Cancellation")}
-                        isDarkMode={isDarkMode}
-                    />
+
                     <ProfileMenu
                         icon={
                             <MaterialIcons

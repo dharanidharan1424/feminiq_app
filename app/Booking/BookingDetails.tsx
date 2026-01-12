@@ -299,15 +299,15 @@ export default function BookingDetails() {
 
           <View className="mt-2">
             {[
-              { icon: "calendar-outline", label: "Date:", value: date },
-              { icon: "time-outline", label: "Time:", value: time },
+              { icon: "calendar-outline" as const, label: "Date:", value: date },
+              { icon: "time-outline" as const, label: "Time:", value: time },
               {
-                icon: "person-outline",
+                icon: "person-outline" as const,
                 label: "Type:",
                 value: specialist[0]?.type || "N/A",
               },
               {
-                icon: "location-outline",
+                icon: "location-outline" as const,
                 label: "Location:",
                 value: serviceLocation || "N/A",
               },
@@ -508,8 +508,8 @@ export default function BookingDetails() {
             <View key={i}>
               <TouchableOpacity
                 className={`flex-row items-center border rounded-lg px-5 mb-2 ${selectedPaymentMethod === v.value
-                    ? "bg-pink-50 border-primary"
-                    : "bg-white border-primary/50"
+                  ? "bg-pink-50 border-primary"
+                  : "bg-white border-primary/50"
                   }`}
                 onPress={() => setSelectedPaymentMethod(v.value)}
                 activeOpacity={0.85}
@@ -521,8 +521,8 @@ export default function BookingDetails() {
                 />
                 <Text
                   className={`text-lg ${selectedPaymentMethod === v.value
-                      ? "text-primary font-poppins-semibold"
-                      : "text-primary/50 font-poppins-regular"
+                    ? "text-primary font-poppins-semibold"
+                    : "text-primary/50 font-poppins-regular"
                     }`}
                 >
                   {v.label}

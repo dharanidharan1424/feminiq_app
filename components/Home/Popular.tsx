@@ -110,8 +110,10 @@ const Popular: React.FC = () => {
         const response = await fetch(
           "https://femiiniq-backend.onrender.com/api/get-staffs"
         );
+
         const json = await response.json();
         const data = json.data;
+        console.log(data);
         if (json.status === "success" && Array.isArray(json.data)) {
           data.sort((a: any, b: any) => Number(b.rating) - Number(a.rating));
           setStaffs(data);
@@ -511,7 +513,7 @@ const Popular: React.FC = () => {
               renderItem={({ item }) => (
                 <ProfileCard
                   data={item}
-                  avatar={{ uri: item.mobile_image_url }}
+                  avatar={{ uri: item.mobile_image_url || item.image }}
                   name={item.name}
                   address={item.address}
                   distance={

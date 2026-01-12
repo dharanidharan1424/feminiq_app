@@ -1,17 +1,17 @@
+import { images } from "@/constants";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   Image,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  Modal,
 } from "react-native";
-import { useRouter } from "expo-router";
-import { images } from "@/constants";
 // Import your loading spinner, e.g. Chase from "react-native-animated-spinkit"
 import { Chase } from "react-native-animated-spinkit"; // adjust path as needed
 
@@ -43,7 +43,7 @@ const ForgetPassword = ({ isDarkMode = false }) => {
     try {
       const body = useEmail ? { email: inputValue } : { mobile: inputValue };
       const res = await fetch(
-        "https://feminiq-backend.onrender.com/otp/forgot-password",
+        "https://femiiniq-backend.onrender.com/otp/forgot-password",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

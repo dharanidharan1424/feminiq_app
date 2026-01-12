@@ -1,16 +1,16 @@
+import { images } from "@/constants";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-  View,
-  Text,
   Image,
-  ScrollView,
-  TouchableOpacity,
   Modal,
   Pressable,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import { images } from "@/constants";
 
 interface PaymentMethod {
   label: string;
@@ -51,9 +51,6 @@ const PaymentAccordion: React.FC = () => {
   const [currentMethod, setCurrentMethod] = useState<PaymentMethod | null>(
     null
   );
-
-  // New state to control info modal visibility
-  const [infoModalVisible, setInfoModalVisible] = useState<boolean>(false);
 
   const openModal = (method: PaymentMethod) => {
     setCurrentMethod(method);
@@ -115,27 +112,6 @@ const PaymentAccordion: React.FC = () => {
           </TouchableOpacity>
         ))}
 
-        <View
-          className="px-10 flex-row items-center justify-center gap-3"
-          style={{ marginTop: 12 }}
-        >
-          {/* Add Bank / UPI details button */}
-          <TouchableOpacity
-            className="flex-row  my-3 py-2 border gap-3 items-center justify-center rounded-full border-primary bg-primary/30"
-            onPress={() => router.push("/Tabs/Profile/BankDetails")}
-            style={{ flex: 1 }}
-          >
-            <Ionicons name="add-circle" color={"#ff5acc"} size={24} />
-            <Text className="font-poppins-semibold text-center mt-1 text-primary">
-              Add Bank / Upi details
-            </Text>
-          </TouchableOpacity>
-
-          {/* Info icon button */}
-          <TouchableOpacity onPress={() => setInfoModalVisible(true)}>
-            <Feather name="info" size={28} color="#ff5acc" />
-          </TouchableOpacity>
-        </View>
       </ScrollView>
 
       {/* Payment method modal */}
@@ -205,84 +181,6 @@ const PaymentAccordion: React.FC = () => {
                 borderRadius: 25,
               }}
               onPress={() => setModalVisible(false)}
-            >
-              <Text
-                style={{
-                  color: "white",
-                  fontFamily: "Poppins_600SemiBold",
-                  fontSize: 16,
-                }}
-              >
-                Close
-              </Text>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
-
-      {/* Info modal for bank details explanation */}
-      <Modal
-        animationType="fade"
-        transparent
-        visible={infoModalVisible}
-        statusBarTranslucent
-        onRequestClose={() => setInfoModalVisible(false)}
-      >
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "rgba(0,0,0,0.5)",
-            justifyContent: "center",
-            alignItems: "center",
-            padding: 20,
-          }}
-        >
-          <View
-            style={{
-              backgroundColor: "white",
-              borderRadius: 12,
-              padding: 24,
-              width: "100%",
-              maxWidth: 350,
-              shadowColor: "#000",
-              shadowOpacity: 0.3,
-              shadowRadius: 20,
-              elevation: 10,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 18,
-                fontFamily: "Poppins_600SemiBold",
-                marginBottom: 16,
-                textAlign: "center",
-              }}
-            >
-              Why add Bank Details?
-            </Text>
-            <Text
-              style={{
-                fontSize: 14,
-                color: "#555",
-                fontFamily: "Poppins_400Regular",
-                marginBottom: 24,
-                textAlign: "center",
-              }}
-            >
-              We require your bank details for refund purposes. Rest assured,
-              your information will be encrypted and stored securely with the
-              highest privacy standards.
-            </Text>
-
-            <Pressable
-              style={{
-                backgroundColor: "#ff5acc",
-                paddingVertical: 10,
-                paddingHorizontal: 24,
-                borderRadius: 25,
-                alignSelf: "center",
-              }}
-              onPress={() => setInfoModalVisible(false)}
             >
               <Text
                 style={{

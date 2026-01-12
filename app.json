@@ -29,17 +29,15 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#FF5ACC"
       },
-      "googleServicesFile": "./android/app/google-services.json",
+      "googleServicesFile": "./google-services.json",
       "config": {
         "googleMaps": {
-          "apiKey": "Your own key"
+          "apiKey": "AIzaSyBzoZoOnaUhPX3JiFEoKtWTn6Duh_nibiI"
         }
       },
       "edgeToEdgeEnabled": true,
       "package": "com.anonymous.feminiq",
       "permissions": [
-        "android.permission.INTERNET",
-        "com.google.android.gms.permission.AD_ID",
         "android.permission.INTERNET",
         "com.google.android.gms.permission.AD_ID"
       ]
@@ -67,11 +65,15 @@
     },
     "extra": {
       "router": {},
-      "razorpayKeyId": "rzp_test_RDvOg9RtgwnB5k"
+      "razorpayKeyId": "rzp_test_RDvOg9RtgwnB5k",
+      "eas": {
+        "projectId": "03c2b7d5-46fe-4a65-9a01-4adb8453c9a9"
+      }
     },
     "runtimeVersion": "1.0.0",
     "updates": {
       "enabled": false
-    }
+    },
+    "owner": "dharanidharanfrommadurai"
   }
 }
