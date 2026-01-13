@@ -1152,101 +1152,102 @@ export default function BookingPage() {
                   )}
                 </View>
 
-                {/* Service Row */}
-                <View className="flex-row mt-1 items-center">
-                  {booking.staff_mobile_image_url || booking.staff_image ? (
+                {/* Staff Image & Details Row */}
+                <View className="flex-row mt-1 mb-3">
+                  {booking.staff_mobile_image_url || booking.staff_image || booking.image ? (
                     <Image
                       source={{
                         uri:
-                          booking.staff_mobile_image_url || booking.staff_image,
+                          booking.staff_mobile_image_url || booking.staff_image || booking.image,
                       }}
-                      className="w-16 h-16 rounded-2xl mr-3"
+                      className="w-20 h-20 rounded-xl mr-3 bg-gray-200"
                       resizeMode="cover"
                     />
                   ) : (
-                    <View className="w-16 h-16 rounded-2xl mr-3 bg-pink-100" />
-                  )}
-                  <View className="flex-1">
-                    <View className="flex-row items-center">
-                      <Text
-                        className={`font-poppins-semibold text-lg mb-1 ${isDarkMode ? "text-white" : "text-gray-900"
-                          }`}
-                      >
-                        {booking.staff_name}
-                      </Text>
-                      {booking.rating && (
-                        <View className="flex-row items-center ml-2 mb-1">
-                          <MaterialIcons name="star" size={14} color="#FF5ACC" />
-                          <Text className="text-xs font-poppins-medium text-[#FF5ACC] ml-0.5">
-                            {Number(booking.rating).toFixed(1)}
-                            {booking.reviews_count ? ` (${booking.reviews_count})` : ""}
-                          </Text>
-                        </View>
-                      )}
+                    <View className="w-20 h-20 rounded-xl mr-3 bg-pink-100 items-center justify-center">
+                      <Ionicons name="person" size={30} color="#FF5ACC" />
                     </View>
+                  )}
+
+                  <View className="flex-1 justify-center">
+                    <View className="flex-row justify-between items-start">
+                      <View className="flex-1 mr-2">
+                        <Text
+                          className={`font-poppins-semibold text-base mb-1 ${isDarkMode ? "text-white" : "text-gray-900"
+                            }`}
+                          numberOfLines={1}
+                        >
+                          {booking.agent_name || booking.staff_name || "Unknown Staff"}
+                        </Text>
+                        <Text
+                          className={`text-xs font-poppins-regular mb-1 ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                            }`}
+                          numberOfLines={2}
+                        >
+                          {booking.address || booking.location || "No address provided"}
+                        </Text>
+                      </View>
+                      <Text className="text-sm font-poppins-semibold text-primary">
+                        ₹{booking.totalprice || booking.finalprice || booking.amount || "0"}
+                      </Text>
+                    </View>
+
                     <Text
-                      className={`text-sm mb-0.5 font-poppins-regular ${isDarkMode ? "text-gray-400" : "text-gray-500"
-                        }`}
-                    >
-                      {booking.service_at}
-                    </Text>
-                    <Text
-                      className={`text-xs font-poppins-regular ${isDarkMode ? "text-gray-500" : "text-gray-600"
+                      className={`text-xs font-poppins-medium mt-1 ${isDarkMode ? "text-gray-500" : "text-gray-600"
                         }`}
                     >
                       Services:
                     </Text>
-                    <Text className="text-xs font-poppins-regular text-primary mt-0.5">
-                      {[
-                        ...(booking.booked_services || []),
-                        ...(booking.booked_packages || []),
-                      ]
-                        .map((s) => `${s.name} x ${s.quantity || 1}`)
-                        .join(", ")}
+                    <Text className="text-xs font-poppins-regular text-gray-500" numberOfLines={2}>
+                      {(booking.services && Array.isArray(booking.services)
+                        ? booking.services.map((s: any) => s.name || s.service_name).join(", ")
+                        : "No services listed")}
                     </Text>
                   </View>
                 </View>
 
                 {/* Buttons */}
-                <View className="flex-row mt-5">
+                <View className="flex-row mt-2 gap-2">
                   {booking.reschedule_status === "pending" ? (
                     <TouchableOpacity
-                      className="flex-1 border border-yellow-500 bg-yellow-100 rounded-full py-2 items-center"
+                      className="flex-1 border border-yellow-500 bg-yellow-50 rounded-full py-2.5 items-center justify-center"
                       onPress={() => handleCancelRescheduleRequest(booking.id)}
                     >
                       <Text className="text-yellow-700 font-poppins-medium text-xs">
-                        Cancel Reschedule Request
+                        Cancel Reschedule
                       </Text>
                     </TouchableOpacity>
                   ) : (
                     <>
                       {showCancel && (
                         <TouchableOpacity
-                          className={`flex-1 mr-2 border border-primary py-2 items-center ${disableActions2
-                            ? "bg-red-100 border border-red-500 rounded-lg"
-                            : "bg-primary/10 rounded-full"
+                          className={`flex-1 border py-2.5 items-center justify-center rounded-full ${disableActions2
+                            ? "bg-red-50 border-red-200"
+                            : "bg-white border-primary"
                             }`}
                           onPress={() => openCancelModal(booking)}
                         >
                           <Text
-                            className={`font-poppins-medium text-xs ${disableActions2 ? "text-red-500" : "text-primary"
+                            className={`font-poppins-medium text-xs ${disableActions2 ? "text-red-400" : "text-primary"
                               }`}
                           >
                             Cancel Booking
                           </Text>
                         </TouchableOpacity>
                       )}
+
                       {showCancel && !disableActions2 && (
                         <TouchableOpacity
-                          className={`flex-1 mx-2 border rounded-full py-2 items-center ${isWithin24Hours(booking)
-                            ? "bg-gray-300 border-gray-400"
-                            : "border-primary bg-primary/20"
+                          className={`flex-1 border rounded-full py-2.5 items-center justify-center ${isWithin24Hours(booking)
+                            ? "bg-gray-100 border-gray-200"
+                            : "bg-primary/10 border-primary/30"
                             }`}
                           onPress={() => handleReschedulePress(booking)}
+                          disabled={isWithin24Hours(booking)}
                         >
                           <Text
                             className={`font-poppins-medium text-xs ${isWithin24Hours(booking)
-                              ? "text-gray-500"
+                              ? "text-gray-400"
                               : "text-primary"
                               }`}
                           >
@@ -1261,13 +1262,13 @@ export default function BookingPage() {
                     <TouchableOpacity
                       className={
                         showCancel
-                          ? "flex-1 ml-2 bg-primary rounded-full py-2 items-center"
+                          ? "flex-1 bg-primary rounded-full py-2.5 items-center justify-center shadow-sm shadow-primary/30"
                           : receiptBtnClasses
                       }
                       onPress={() =>
                         router.push({
                           pathname: "/Booking/Reciept",
-                          params: { bookingCode: booking.booking_code },
+                          params: { bookingCode: booking.order_id || booking.booking_code },
                         })
                       }
                     >
