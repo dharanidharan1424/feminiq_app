@@ -24,21 +24,27 @@ type ServiceOrPackage = {
 };
 
 type BookingType = {
+  id: number;
+  order_id?: string;
+  booking_code: string;
   receipt_id: number;
   notes: string;
   total_price: number;
-  services: never[];
+  services: any[];
   service_at: string;
   address: string;
+  location?: string;
   user_name: string;
   user_mobile: string;
-  booking_code: string;
   date: string;
   time: string;
+  booking_date?: string;
+  booking_time?: string;
   specialist: SpecialistType[] | SpecialistType;
   booked_services: ServiceOrPackage[];
   booked_packages: ServiceOrPackage[];
   staff_name: string;
+  agent_name?: string;
 };
 
 function formatDisplayDate(dateStr: string) {
