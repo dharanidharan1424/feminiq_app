@@ -671,19 +671,37 @@ export default function BookingPage() {
   // Confirm Cancel Booking
   async function handleConfirmCancel() {
     const code = bookingToCancel?.order_id || bookingToCancel?.booking_code;
-    if (!code) return;
+    console.log("🔹 Attempting to cancel booking with code:", code);
 
-    await fetch("https://femiiniq-backend.onrender.com/booking/cancel", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        booking_code: code, // Backend expects booking_code key
-        reason: cancelReason,
-      }),
-    });
+    if (!code) {
+      alert("Error: Booking code not found. Cannot cancel.");
+      return;
+    }
 
-    setShowCancelModal(false);
-    fetchBookings();
+    try {
+      const response = await fetch("https://femiiniq-backend.onrender.com/booking/cancel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          booking_code: code, // Backend expects booking_code key
+          reason: cancelReason,
+        }),
+      });
+
+      const data = await response.json();
+      console.log("🔹 Cancel API Response:", data);
+
+      if (data.status === "success") {
+        showToast("Booking cancelled successfully", "success", "bottom");
+        setShowCancelModal(false);
+        fetchBookings();
+      } else {
+        alert(data.message || "Failed to cancel booking");
+      }
+    } catch (error) {
+      console.error("Cancel API error:", error);
+      alert("Network error while cancelling booking");
+    }
   }
 
   // Open Reschedule Modal
@@ -705,11 +723,14 @@ export default function BookingPage() {
       !bookingToReschedule?.id ||
       !rescheduleDate ||
       !rescheduleTime
-    )
+    ) {
+      alert("Please select date and time");
       return;
+    }
+
     setRescheduleLoading(true); // start loading
     try {
-      await fetch(
+      const response = await fetch(
         "https://femiiniq-backend.onrender.com/booking/reschedule-request",
         {
           method: "POST",
@@ -722,6 +743,23 @@ export default function BookingPage() {
           }),
         }
       );
+
+      const data = await response.json();
+      console.log("🔹 Reschedule API Response:", data);
+
+      if (data.status === "success" || data.message?.includes("submitted")) { // flexible check
+        showToast(
+          "Reschedule request submitted.",
+          "success",
+          "bottom"
+        );
+        setShowRescheduleModal(false);
+        fetchBookings();
+      } else {
+        alert(data.message || "Failed to submit reschedule request");
+      }
+
+    } catch (err) {
 
       showToast(
         "Reschedule request submitted and pending approval.",
