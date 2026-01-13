@@ -778,7 +778,9 @@ export default function BookingPage() {
   const closeRejectedModal = () => setShowRejectedModal(false);
   const closeApprovedModal = () => setShowApprovedModal(false);
 
-  const filtered = bookings.filter((b) => b.status === statusMap[selected]);
+  const filtered = bookings.filter((b) =>
+    b.status && b.status.toLowerCase() === statusMap[selected].toLowerCase()
+  );
 
   useEffect(() => {
     const backAction = () => {
