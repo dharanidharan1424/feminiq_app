@@ -760,17 +760,6 @@ export default function BookingPage() {
       }
 
     } catch (err) {
-
-      showToast(
-        "Reschedule request submitted and pending approval.",
-        "success",
-        "bottom"
-      );
-
-      setShowRescheduleModal(false);
-
-      fetchBookings();
-    } catch (err) {
       console.log(err);
       showToast("Error submitting reschedule request.", "remove", "bottom");
     } finally {
