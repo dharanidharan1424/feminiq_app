@@ -586,7 +586,13 @@ export default function BookingPage() {
     })
       .then((res) => res.json())
       .then((data) => {
+        console.log("🔹 API Response:", data);
         if (data.bookings) {
+          console.log("🔹 Bookings count:", data.bookings.length);
+          if (data.bookings.length > 0) {
+            console.log("🔹 Sample Booking Status:", data.bookings[0].status);
+            console.log("🔹 Filter Target:", statusMap[selected]);
+          }
           setBookings(data.bookings);
 
           // Check for rejected reschedule status only where booking.state is null (not rejected yet)

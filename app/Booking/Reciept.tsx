@@ -209,8 +209,8 @@ export default function ReceiptPage() {
       if (!booking) return;
       setDownloading(true);
 
-      const receiptUrl = `https://femiiniq-backend.onrender.com/receipt/${booking.receipt_id}`;
-      const fileName = `receipt_${booking.receipt_id}_${Date.now()}.pdf`;
+      const receiptUrl = `https://femiiniq-backend.onrender.com/receipt/${booking.id}`; // Use ID for receipt
+      const fileName = `receipt_${booking.id}_${Date.now()}.pdf`;
       const fileUri = FileSystem.documentDirectory + fileName;
 
       // Download PDF to document directory
@@ -251,6 +251,10 @@ export default function ReceiptPage() {
       }
     }
   };
+
+  const displayDate = booking.booking_date || booking.date;
+  const displayTime = booking.booking_time || booking.time;
+  const displayServices = booking.services || booking.booked_services || [];
 
   return (
     <ScrollView
@@ -293,18 +297,18 @@ export default function ReceiptPage() {
         }}
       >
         {[
-          { label: "Receipt id", value: booking.receipt_id },
-          { label: "Service Provider", value: booking.staff_name },
-          { label: "Service At", value: booking.service_at },
-          { label: "Address", value: booking.address },
+          { label: "Receipt Order ID", value: booking.order_id || booking.booking_code || booking.id },
+          { label: "Service Provider", value: booking.agent_name || booking.staff_name || "Feminiq Staff" },
+          { label: "Service At", value: booking.service_at || "Home" },
+          { label: "Address", value: booking.address || booking.location },
           { label: "Name", value: profile?.fullname || booking.user_name },
           {
             label: "Phone",
-            value: `+91 ${profile?.mobile || booking.user_mobile}`,
+            value: `+91 ${profile?.mobile || booking.user_mobile || ""}`,
           },
-          { label: "Booking Date", value: formatDisplayDate(booking.date) },
-          { label: "Booking Time", value: booking.time },
-          { label: "Specialist", value: specialistText },
+          { label: "Booking Date", value: formatDisplayDate(String(displayDate)) },
+          { label: "Booking Time", value: displayTime },
+          { label: "Specialist", value: specialistText || "N/A" },
         ].map(({ label, value }, index) => (
           <View key={index} className="flex-row justify-between mb-2">
             <Text
@@ -337,22 +341,19 @@ export default function ReceiptPage() {
         >
           Product Details
         </Text>
-        {[
-          ...(booking.booked_services || []),
-          ...(booking.booked_packages || []),
-        ].map((item, idx) => (
+        {displayServices.map((item: any, idx: number) => (
           <View key={idx} className="flex-row justify-between py-1">
             <Text
               className="font-poppins-regular text-[12px]"
               style={{ color: isDarkMode ? "#888" : "#6b7280" }}
             >
-              {item.name} {`( ${item.quantity} )`}
+              {item.name || item.service_name} {`( ${item.quantity || 1} )`}
             </Text>
             <Text
               className="font-poppins-semibold text-sm"
               style={{ color: isDarkMode ? "#eee" : undefined }}
             >
-              ₹ {item.price}
+              ₹ {item.price || item.total_price || item.amount}
             </Text>
           </View>
         ))}
