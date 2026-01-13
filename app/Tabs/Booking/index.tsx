@@ -561,9 +561,18 @@ export default function BookingPage() {
   };
 
   const isWithin24Hours = (booking: any) => {
-    if (!booking.date || !booking.time) return false;
-    const [hour, minute] = booking.time.split(":");
-    const bookingDateTime = new Date(booking.date);
+    // 24hr logic updated for new schema
+    const date = booking.booking_date || booking.date;
+    const time = booking.booking_time || booking.time;
+
+    if (!date || !time) return false;
+
+    // Safety check for time format
+    const timeParts = time.split(":");
+    if (timeParts.length < 2) return false;
+
+    const [hour, minute] = timeParts;
+    const bookingDateTime = new Date(date);
     bookingDateTime.setHours(parseInt(hour), parseInt(minute), 0, 0);
     const diffMs = bookingDateTime.getTime() - Date.now();
     const diffHours = diffMs / (1000 * 60 * 60);
@@ -573,47 +582,45 @@ export default function BookingPage() {
   // Fetch bookings from API
   const fetchBookings = useCallback(() => {
     if (!profile?.id) {
+      // ... existing code ...
       setLoading(false);
       return;
     }
+    // ... existing code ...
     setLoading(true);
 
     const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), 10000); // 10 seconds timeout
+    const id = setTimeout(() => controller.abort(), 10000);
 
     fetch(`https://femiiniq-backend.onrender.com/booking/user/${profile.id}`, {
       signal: controller.signal,
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log("🔹 API Response:", data);
         if (data.bookings) {
-          console.log("🔹 Bookings count:", data.bookings.length);
-          if (data.bookings.length > 0) {
-            console.log("🔹 Sample Booking Status:", data.bookings[0].status);
-            console.log("🔹 Filter Target:", statusMap[selected]);
-          }
           setBookings(data.bookings);
 
-          // Check for rejected reschedule status only where booking.state is null (not rejected yet)
+          // Check for rejected reschedule status
           const hasRejected = data.bookings.some(
             (b: Booking) =>
               b.reschedule_status === "rejected" && b.status !== "cancelled"
           );
 
-          // Check for approved reschedule status only where booking.state is null (not approved yet)
+          // Check for approved reschedule status
           const hasApproved = data.bookings.some(
             (b: Booking) =>
               b.reschedule_status === "approved" && b.status !== "pending"
           );
 
           if (hasRejected && !wasRejectedShown) {
+            // ... existing code ...
             setModalMessage(
               "Your reschedule request was rejected by the provider. Please cancel the booking to get the refund."
             );
             setShowRejectedModal(true);
             setWasRejectedShown(true);
           } else if (hasApproved && !wasApprovedShown) {
+            // ... existing code ...
             setModalMessage(
               "Your reschedule request was approved by the Service Provider"
             );
@@ -623,11 +630,8 @@ export default function BookingPage() {
         }
       })
       .catch((err) => {
-        if (err.name === "AbortError") {
-          console.log("Fetch bookings request timed out");
-        } else {
-          console.error("Fetch bookings error:", err);
-        }
+        // ... existing code ... 
+        console.error("Fetch bookings error:", err);
       })
       .finally(() => {
         clearTimeout(id);
@@ -666,13 +670,14 @@ export default function BookingPage() {
 
   // Confirm Cancel Booking
   async function handleConfirmCancel() {
-    if (!bookingToCancel?.booking_code) return;
+    const code = bookingToCancel?.order_id || bookingToCancel?.booking_code;
+    if (!code) return;
 
     await fetch("https://femiiniq-backend.onrender.com/booking/cancel", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        booking_code: bookingToCancel.booking_code,
+        booking_code: code, // Backend expects booking_code key
         reason: cancelReason,
       }),
     });
@@ -697,7 +702,7 @@ export default function BookingPage() {
   // Confirm Reschedule Booking
   async function handleConfirmReschedule() {
     if (
-      !bookingToReschedule?.booking_code ||
+      !bookingToReschedule?.id ||
       !rescheduleDate ||
       !rescheduleTime
     )
