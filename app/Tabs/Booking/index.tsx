@@ -978,9 +978,10 @@ export default function BookingPage() {
               }
             };
 
-            const staffId = booking.staff_id; // or however you get the staff ID
+            const staffId = booking.agent_id || booking.staff_id; // Added agent_id check
 
             const getStaffDetails = async () => {
+              if (!staffId) return; // Prevention
               try {
                 const response = await fetch(
                   `https://femiiniq-backend.onrender.com/api/get-staffs/${staffId}`
@@ -988,6 +989,8 @@ export default function BookingPage() {
 
                 const data = await response.json();
                 const staffData = data.data;
+
+                if (!staffData) return; // Prevention
 
                 // Explicitly convert all properties to strings for navigation
                 router.push({
@@ -1038,7 +1041,7 @@ export default function BookingPage() {
                     className={`font-poppins-semibold text-base ${isDarkMode ? "text-gray-300" : "text-gray-700"
                       }`}
                   >
-                    {formatDateTime(booking.date, booking.time)}
+                    {formatDateTime(booking.booking_date || booking.date, booking.booking_time || booking.time)}
                   </Text>
 
                   <View className="flex-row items-center ">
